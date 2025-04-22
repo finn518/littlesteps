@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "248292876466",
+    "project_id": "littlesteps-52095",
+    "storage_bucket": "littlesteps-52095.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:248292876466:android:bdb961733a38d1dd7869ab",
+        "android_client_info": {
+          "package_name": "com.example.littlesteps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlz8AIORvwdeDrBQvYd50_wJVWvfMJoZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
