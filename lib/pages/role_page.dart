@@ -33,7 +33,7 @@ class RolePage extends StatelessWidget {
             Stack(
               children: [
                 Image.asset(
-                "assets/splash.png",
+                "assets/images/LOGO_FINAL.png",
                 width: 200,
                 height: 200,
               ),
