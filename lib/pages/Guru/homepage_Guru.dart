@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import "package:littlesteps/utils/auth.dart";
+import "package:littlesteps/utils/auth_service.dart";
 
 class HomepageGuru extends StatefulWidget {
   const HomepageGuru({super.key});

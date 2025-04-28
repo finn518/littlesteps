@@ -5,7 +5,6 @@ import 'package:firebase_database/firebase_database.dart'; // Tambahkan ini
 
 class AuthService {
   final firebaseAuth = FirebaseAuth.instance;
-// Inisialisasi tanpa parameter app
   final database = FirebaseDatabase.instanceFor(
     app: Firebase.app(),
     databaseURL: "https://littlesteps-52095-default-rtdb.asia-southeast1.firebasedatabase.app/"

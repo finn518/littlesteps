@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/login_page.dart';
-import 'package:littlesteps/utils/auth.dart';
+import 'package:littlesteps/utils/auth_service.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class AuthGate extends StatelessWidget {
