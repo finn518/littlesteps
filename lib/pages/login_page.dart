@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   //check login
-  void login() async{
+  void login() async {
     final email = emailController.text;
     final password = passwordController.text;
 
@@ -33,17 +33,18 @@ class _LoginPageState extends State<LoginPage> {
       await authService.signInWithEmail(email: email, password: password);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$e")));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("$e")));
       }
     }
   }
 
-  void loginGoogle(String role) async{
+  void loginGoogle(String role) async {
     try {
       await authService.signInWithGoogle(role: role);
       if (mounted) {
         // Ganti halaman jika berhasil login
-         Navigator.pushReplacement(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => AuthGate(role: widget.role),
@@ -57,7 +58,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +77,7 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              EdgeInsets.only(
+          padding: EdgeInsets.only(
               left: width * 0.13,
               right: width * 0.13,
               bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -109,7 +108,8 @@ class _LoginPageState extends State<LoginPage> {
                     Padding(
                       padding: EdgeInsets.only(
                           top: height * 0.015, left: height * 0.2),
-                      child: GestureDetector(onTap: () {
+                      child: GestureDetector(
+                        onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -118,8 +118,13 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           );
-                      },
-                      child: Text("Lupa Kata Sandi ?", style: TextStyle(fontSize: 14, color: Color(0xff0066FF),fontWeight: FontWeight.bold)),),
+                        },
+                        child: Text("Lupa Kata Sandi ?",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xff0066FF),
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
                     CustomButton(label: "Masuk", onPressed: login),
                     Center(
@@ -152,8 +157,12 @@ class _LoginPageState extends State<LoginPage> {
                     CustomButton(
                         label: "Buat Akun",
                         onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage(role: widget.role)));
-                    }),
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      SignupPage(role: widget.role)));
+                        }),
                   ],
                 ),
               ),
@@ -163,5 +172,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }

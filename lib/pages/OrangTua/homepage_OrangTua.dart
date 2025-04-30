@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:littlesteps/pages/OrangTua/beranda.dart";
 import "package:littlesteps/pages/OrangTua/galeri_page.dart";
-import "package:littlesteps/pages/OrangTua/informasiAnak_page.dart";
+import "package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart";
 import "package:littlesteps/pages/OrangTua/keyanak_page.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";
@@ -13,7 +13,8 @@ import "package:littlesteps/widgets/customappbar.dart";
 import "package:littlesteps/widgets/customdrawer.dart";
 
 class HomePageOrangTua extends StatefulWidget {
-  const HomePageOrangTua({super.key});
+  final String role;
+  const HomePageOrangTua({super.key, required this.role});
 
   @override
   State<HomePageOrangTua> createState() => _HomePageState();
@@ -37,7 +38,9 @@ class _HomePageState extends State<HomePageOrangTua> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(),
+      appBar: CustomAppbar(
+        role: widget.role,
+      ),
       drawer: CustomDrawer(
         namaUser: "Bu Mira",
         menuItems: [
