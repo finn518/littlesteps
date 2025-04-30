@@ -36,11 +36,13 @@ dependencies:
   firebase_database: ^11.3.5
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.4
   google_sign_in: ^6.3.0
-  supabase_flutter: ^2.8.4
   image_picker: ^1.1.2
   intl: ^0.20.2
+  provider: ^6.1.5
+  supabase_flutter: ^2.8.4
   table_calendar: ^3.2.0
 
 dev_dependencies:
@@ -58,6 +60,11 @@ flutter_native_splash:
   android: true
   ios: false
   web: true
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/LOGO_FINAL.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

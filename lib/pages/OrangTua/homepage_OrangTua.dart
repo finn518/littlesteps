@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:littlesteps/pages/OrangTua/beranda.dart";
 import "package:littlesteps/pages/OrangTua/galeri_page.dart";
-import "package:littlesteps/pages/OrangTua/informasiAnak_page.dart";
+import "package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart";
 import "package:littlesteps/pages/OrangTua/keyanak_page.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";

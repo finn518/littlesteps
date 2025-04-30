@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:littlesteps/pages/OrangTua/informasiAnak_page.dart';
+import 'package:littlesteps/pages/Guru/siswa.dart';
+import 'package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart';
 import 'package:littlesteps/pages/ResetPassword/resetPasswordflow.dart';
 import 'package:littlesteps/widgets/customtextfield.dart';
 
@@ -9,6 +10,12 @@ class KeyAnakPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Siswa newSiswa = Siswa(
+        name: 'Siti Fatimah',
+        imagePath: 'assets/images/siti.png',
+        parentName: 'Bu Mira',
+        isConnected: true);
+
     final keyController = TextEditingController();
     return ResetPasswordFlow(
       title: "Informasi Anak Anda Belum Terhubung", 
@@ -16,7 +23,10 @@ class KeyAnakPage extends StatelessWidget {
       buttonText: "Lanjutkan", 
       body: CustomTextField(label: "Kode Teks", controller: keyController),
       onButtonPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => InformasiAnakPage()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => ProfilSiswaPage(siswa: newSiswa)));
       },
     );
   }

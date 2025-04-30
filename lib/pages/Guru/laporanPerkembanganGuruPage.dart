@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/ProfilSiswa/detaillaporanperkembangan_page.dart';
 
 class LaporanPerkembanganGuru extends StatefulWidget {
-  const LaporanPerkembanganGuru({super.key});
+  final bool? isTeacher;
+  const LaporanPerkembanganGuru({super.key, this.isTeacher});
 
   @override
   State<LaporanPerkembanganGuru> createState() =>
@@ -127,6 +129,7 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
 
   @override
   Widget build(BuildContext context) {
+    final isTeacher = widget.isTeacher == true;
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
@@ -156,27 +159,33 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
                 return temaLaporanTile(
                   tema['judul']!,
                   tema['bulan']!,
-                  () => _onTemaTap(tema['judul']!, tema['bulan']!),
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => DetailLaporanPerkembanganPage())),
                 );
               },
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showTambahTemaForm,
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add, color: Colors.white),
-        shape: CircleBorder(),
-      ),
+      floatingActionButton: isTeacher
+          ? FloatingActionButton(
+              onPressed: _showTambahTemaForm,
+              backgroundColor: Colors.blue,
+              child: const Icon(Icons.add, color: Colors.white),
+              shape: const CircleBorder(),
+            )
+          : null,
+
     );
   }
 
-  void _onTemaTap(String judul, String bulan) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Klik tema: $judul - Bulan: $bulan')),
-    );
-  }
+  // void _onTemaTap(String judul, String bulan) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text('Klik tema: $judul - Bulan: $bulan')),
+  //   );
+  // }
 
   Widget temaLaporanTile(String judul, String bulan, VoidCallback onTap) {
     return GestureDetector(

@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'ProfilSiswaPage.dart';
+import 'package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart';
 import 'siswa.dart';
 
 class KelasPage extends StatefulWidget {
