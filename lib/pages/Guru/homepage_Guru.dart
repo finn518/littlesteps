@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import "package:littlesteps/utils/auth.dart";
-
-import 'KelasPage.dart';
-import 'calenderPage.dart';
-import 'kehadiranPage.dart';
-import 'koneksiSiswaPage.dart';
-import 'siswa.dart';
+import "package:littlesteps/pages/Guru/berandaGuruPage.dart";
+import "package:littlesteps/pages/Guru/galeriGuruPage.dart";
+import "package:littlesteps/pages/bantuan_page.dart";
+import "package:littlesteps/pages/editprofile_page.dart";
+import "package:littlesteps/pages/pesan_page.dart";
+import "package:littlesteps/utils/auth_service.dart";
+import "package:littlesteps/widgets/bottomNavbar.dart";
+import "package:littlesteps/widgets/customappbar.dart";
+import "package:littlesteps/widgets/customdrawer.dart";
 
 class HomepageGuru extends StatefulWidget {
-  const HomepageGuru({super.key});
+  final String role;
+  const HomepageGuru({super.key, required this.role});
 
   @override
   State<HomepageGuru> createState() => _nameState();
@@ -16,6 +19,15 @@ class HomepageGuru extends StatefulWidget {
 
 class _nameState extends State<HomepageGuru> {
   final authService = AuthService();
+  List<Widget> pages = [BerandaGuru(), GaleriGuruPage(), PesanPage()];
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   void logout() async {
     await authService.signOut();
   }
@@ -23,141 +35,112 @@ class _nameState extends State<HomepageGuru> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.lerp(Color(0xff53B1FD), Colors.white, 0.9),
-        body: SafeArea(
-          child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                          child: _menuButton(Icons.calendar_month, 'Calender',
-                              Color(0xFF8ED8FA), CalenderPage())),
-                      Expanded(
-                          child: _menuButton(Icons.person, 'Kehadiran',
-                              Color(0xFFFDE272), KehadiranPage())),
-                      Expanded(
-                          child: _menuButton(Icons.book, 'Koneksi Siswa',
-                              Color(0xFFFF9C66), koneksiSiswaPage())),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Expanded(
-                      child: ListView(
-                    children: [
-                      _classCard(
-                          'Kelas A',
-                          'assets/kelas_a.png',
-                          Colors.blue[100]!,
-                          KelasPage(
-                              namaKelas: 'Kelas A', listSiswa: siswaKelasA)),
-                      _classCard(
-                          'Kelas B',
-                          'assets/kelas_b.png',
-                          Colors.yellow[100]!,
-                          KelasPage(
-                              namaKelas: 'Kelas B', listSiswa: siswaKelasB)),
-                    ],
-                  ))
-                ],
-              )),
-        ));
+      backgroundColor: Color.lerp(Color(0xff53B1FD), Colors.white, 0.9),
+      appBar: CustomAppbar(role: widget.role),
+      drawer: CustomDrawer(namaUser: "Bu Rani", menuItems: [
+        {
+          'title': 'Profil',
+          'onTap': () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => EditProfilePage()));
+          }
+        },
+        {
+          'title': 'Bantuan',
+          'onTap': () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => BantuanPage()));
+          }
+        },
+        {
+          'title': 'Keluar Akun',
+          'onTap': () => showLogoutDialog(context),
+        },
+      ]),
+      body: SafeArea(child: pages[_selectedIndex]),
+      bottomNavigationBar: CustomBottomNavbar(
+        currentIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
+      ),
+    );
   }
-}
 
-Widget _menuButton(IconData icon, String label, Color color, Widget halaman) {
-  return Builder(
-    builder: (context) {
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => halaman),
-          );
-        },
-        child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                      offset: Offset(0, 5))
-                ]),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: Colors.black, size: 28),
-                SizedBox(height: 8),
-                FittedBox(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )
-              ],
-            )),
-      );
-    },
-  );
-}
-
-Widget _classCard(
-    String name, String imagePath, Color bgColor, Widget halaman) {
-  return Builder(
-    builder: (context) {
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => halaman),
-          );
-        },
-        child: Container(
-          margin: EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          contentPadding: EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 150, // bisa disesuaikan
+              Text(
+                "Apakah Anda yakin\ningin keluar akun?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  name,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              SizedBox(height: 10),
+              Text(
+                "Semua perubahan yang belum\ndisimpan mungkin akan hilang",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 18,
                 ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Tombol Ya
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Color(0xff0066FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context); // tutup dialog
+                      // Aksi logout
+                      logout();
+                    },
+                    child: Text("Ya",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            fontSize: 18)),
+                  ),
+                  SizedBox(width: 16),
+                  // Tombol Tidak
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.black),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 30),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Tidak",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xff0066FF),
+                            fontSize: 18)),
+                  ),
+                ],
               ),
             ],
           ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
+  }
 }

@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'KelasPage.dart';
-import 'siswa.dart';
+import 'package:littlesteps/pages/Guru/KelasPage.dart';
+import 'package:littlesteps/pages/Guru/siswa.dart';
+import 'package:littlesteps/pages/Guru/laporanPerkembanganGuruPage.dart';
+import 'package:littlesteps/pages/Guru/rangkumanKehadiran.dart';
 
 class ProfilSiswaPage extends StatelessWidget {
   final Siswa siswa;
@@ -55,7 +57,17 @@ class ProfilSiswaPage extends StatelessWidget {
             elevation: 2,
           ),
           onPressed: (){
-            //TODO
+            if (title == "Laporan Perkembangan") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LaporanPerkembanganGuru()),
+            );
+          } else if (title == "Rangkuman Kehadiran") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const RangkumanKehadiran()),
+            );
+          }
           },
           child: Text(title, style: const TextStyle(
             color: Colors.black, fontWeight: FontWeight.bold,

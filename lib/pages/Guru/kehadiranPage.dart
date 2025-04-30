@@ -189,7 +189,28 @@ class _KehadiranPageState extends State<KehadiranPage> {
                               ],
                             ),
                           );
-                        }))
+                        })),
+            SafeArea(
+                child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12))),
+                    onPressed: () {},
+                    child: const Text(
+                      'Simpan Kehadiran',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    )),
+              ),
+            ))
           ],
         ));
   }

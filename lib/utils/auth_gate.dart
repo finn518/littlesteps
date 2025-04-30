@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/login_page.dart';
-import 'package:littlesteps/utils/auth.dart';
+import 'package:littlesteps/utils/auth_service.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class AuthGate extends StatelessWidget {
@@ -16,7 +16,11 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final databaseRef = FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: 'https://littlesteps-52095-default-rtdb.asia-southeast1.firebasedatabase.app/').ref();
+    final databaseRef = FirebaseDatabase.instanceFor(
+            app: Firebase.app(),
+            databaseURL:
+                'https://littlesteps-52095-default-rtdb.asia-southeast1.firebasedatabase.app/')
+        .ref();
 
     return StreamBuilder<User?>(
       stream: AuthService().authStateChange,
@@ -51,9 +55,11 @@ class AuthGate extends StatelessWidget {
 
               switch (userRole) {
                 case "Guru":
-                  return const HomepageGuru();
+                  return HomepageGuru(role: userRole);
                 case "Orang Tua":
-                  return const HomePageOrangTua();
+                  return HomePageOrangTua(
+                    role: userRole,
+                  );
                 default:
                   return const Scaffold(
                       body: Center(child: Text("Role tidak dikenali")));

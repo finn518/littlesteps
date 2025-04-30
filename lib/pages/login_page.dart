@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:littlesteps/pages/resetPassword_page.dart';
+import 'package:littlesteps/pages/ResetPassword/resetpassword_page.dart';
 import 'package:littlesteps/pages/signup_page.dart';
-import 'package:littlesteps/utils/auth.dart';
+import 'package:littlesteps/utils/auth_service.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
-import 'package:littlesteps/widgets/button.dart';
-import 'package:littlesteps/widgets/edittext.dart';
+import 'package:littlesteps/widgets/custombutton.dart';
+import 'package:littlesteps/widgets/customtextfield.dart';
 import 'package:littlesteps/utils/auth_gate.dart';
 
 class LoginPage extends StatefulWidget {
@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   //check login
-  void login() async{
+  void login() async {
     final email = emailController.text;
     final password = passwordController.text;
 
@@ -33,17 +33,18 @@ class _LoginPageState extends State<LoginPage> {
       await authService.signInWithEmail(email: email, password: password);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$e")));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("$e")));
       }
     }
   }
 
-  void loginGoogle(String role) async{
+  void loginGoogle(String role) async {
     try {
       await authService.signInWithGoogle(role: role);
       if (mounted) {
         // Ganti halaman jika berhasil login
-         Navigator.pushReplacement(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => AuthGate(role: widget.role),
@@ -58,42 +59,74 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
     final height = DeviceDimensions.height(context);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(
+              Icons.arrow_back,
+              size: 36,
+            )),
+      ),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+              left: width * 0.13,
+              right: width * 0.13,
+              bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: height * 0.01),
+              SizedBox(
                 child: Column(
                   children: [
                     Container(
-                      margin: EdgeInsets.only(top: height * 0.07, bottom: height * 0.015),
+                      margin: EdgeInsets.only(bottom: height * 0.02),
                       child: Text(
                         "Masuk",
                         style: TextStyle(
                             fontSize: 32, fontWeight: FontWeight.w800),
                       ),
                     ),
-                    Center(child: InputBar(label: "Surel atau Nomor Telepon", controller: emailController,)),
-                    Center(child: InputBar(label: "Kata Sandi", isPassword: true, controller: passwordController,)),
+                    Center(
+                        child: CustomTextField(
+                      label: "Surel atau Nomor Telepon",
+                      controller: emailController,
+                    )),
+                    Center(
+                        child: CustomTextField(
+                      label: "Kata Sandi",
+                      isPassword: true,
+                      controller: passwordController,
+                    )),
                     Padding(
-                      padding: EdgeInsets.only(top: height * 0.015, left: height * 0.25),
-                      child: GestureDetector(onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ForgetPasswordPage()));
-                      },
-                      child: Text("Lupa Kata Sandi ?", style: TextStyle(fontSize: 14, color: Color(0xff0066FF),fontWeight: FontWeight.bold)),),
+                      padding: EdgeInsets.only(
+                          top: height * 0.015, left: height * 0.2),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResetPasswordPage(
+                                role: widget.role,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text("Lupa Kata Sandi ?",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xff0066FF),
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
-                    CustomButton(width: width, height: height,label:  "Masuk", onPressed: login),
+                    CustomButton(label: "Masuk", onPressed: login),
                     Center(
                       child: Text(
                         "Atau lanjutkan dengan Google",
@@ -101,18 +134,18 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      width: width * 0.1,
-                      height: height * 0.1,
+                      width: width * 0.12,
+                      height: height * 0.08,
                       child: IconButton(
                         onPressed: () => loginGoogle(widget.role),
-                        icon: Image.asset("assets/gIcon.png"),
+                        icon: Image.asset("assets/icons/Google_Icon.png"),
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: height * 0.2 ),
+                margin: EdgeInsets.only(top: height * 0.2),
                 child: Column(
                   children: [
                     Center(
@@ -121,9 +154,15 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(fontSize: 12),
                       ),
                     ),
-                    CustomButton(width: width, height: height,label:  "Buat Akun", onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage(role: widget.role)));
-                    }),
+                    CustomButton(
+                        label: "Buat Akun",
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      SignupPage(role: widget.role)));
+                        }),
                   ],
                 ),
               ),
@@ -133,5 +172,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }
