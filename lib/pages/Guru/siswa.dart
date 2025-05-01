@@ -16,7 +16,7 @@ final List<Siswa> siswaKelasA = [
   Siswa(name: 'Karim', imagePath: 'assets/images/kid_face.png'),
   Siswa(
       name: 'Siti Fatimah',
-      imagePath: 'assets/images/kid_face.png',
+      imagePath: 'assets/images/siti.png',
       parentName: 'Bu Mira',
       isConnected: true),
   Siswa(

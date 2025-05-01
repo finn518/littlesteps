@@ -1,35 +1,37 @@
+import 'dart:io';
+
 import "package:flutter/material.dart";
 import "package:littlesteps/pages/Guru/laporanPerkembanganGuruPage.dart";
 import "package:littlesteps/pages/Guru/rangkumanKehadiran.dart";
-import 'dart:io';
 import "package:littlesteps/pages/Guru/siswa.dart";
 import "package:littlesteps/pages/ProfilSiswa/catatankesehatan_page.dart";
-import "package:littlesteps/pages/ProfilSiswa/detaillaporanperkembangan_page.dart";
 import "package:littlesteps/pages/ProfilSiswa/rangkumanpenilaian_page.dart";
 
 class ProfilSiswaPage extends StatelessWidget {
   final Siswa siswa;
-  const ProfilSiswaPage({super.key, required this.siswa});
+  final String role;
+  const ProfilSiswaPage({super.key, required this.siswa, required this.role});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            leading: IconButton(
-                padding: EdgeInsets.symmetric(horizontal: 30),
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                Icons.arrow_back,
-                size: 36,
-                )
-            ),
-        ),
-        body: SafeArea(
+      appBar: AppBar(
+        leading: IconButton(
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(
+              Icons.arrow_back,
+              size: 36,
+            )),
+      ),
+      body: SafeArea(
         child: Column(
           children: [
             CircleAvatar(
               radius: 70,
-              backgroundImage: siswa.imagePath.startsWith('assets') ? AssetImage(siswa.imagePath) as ImageProvider : FileImage(File(siswa.imagePath)),
+              backgroundImage: siswa.imagePath.startsWith('assets')
+                  ? AssetImage(siswa.imagePath) as ImageProvider
+                  : FileImage(File(siswa.imagePath)),
             ),
             SizedBox(height: 25),
             Text(
@@ -38,24 +40,26 @@ class ProfilSiswaPage extends StatelessWidget {
             ),
             SizedBox(height: 30),
             buildMenuButton("Catatan Kesehatan", Color(0xffB2DDFF), () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => CatatankesehatanPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => CatatankesehatanPage(role: role)));
             }),
             buildMenuButton("Laporan Perkembangan", Color(0xffFDE272), () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => LaporanPerkembanganGuru()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => LaporanPerkembanganGuru(role: role)));
             }),
             buildMenuButton("Rangkuman Penilaian", Color(0xffFF9C66), () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => RangkumanPerkembanganPage()));
+                      builder: (_) => RangkumanPerkembanganPage(role: role)));
             }),
             buildMenuButton("Rangkuman Kehadiran", Color(0xffACDC79), () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => RangkumanKehadiran()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => RangkumanKehadiran()));
             }),
           ],
         ),
@@ -92,5 +96,4 @@ class ProfilSiswaPage extends StatelessWidget {
       ),
     );
   }
-
 }

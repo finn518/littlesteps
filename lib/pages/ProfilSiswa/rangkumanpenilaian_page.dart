@@ -3,7 +3,8 @@ import 'package:littlesteps/pages/ProfilSiswa/detailpenilaian_page.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class RangkumanPerkembanganPage extends StatefulWidget {
-  const RangkumanPerkembanganPage({super.key});
+  final String role;
+  const RangkumanPerkembanganPage({super.key, required this.role});
 
   @override
   State<RangkumanPerkembanganPage> createState() =>
@@ -12,9 +13,107 @@ class RangkumanPerkembanganPage extends StatefulWidget {
 
 class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
   String? selectedSemester;
+  final semester = TextEditingController();
+  final judul = TextEditingController();
+  final catatan = TextEditingController();
+
+  void _showTambahRangkuman() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.8,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Buat Rangkuman\nPenilaian',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(semester, 'Tulis pilihan semester disini...'),
+                  const SizedBox(height: 12),
+                  _buildTextField(judul, 'Tulis judul Anda disini...'),
+                  const SizedBox(height: 12),
+                  _buildTextField(catatan, 'Tulis catatan Anda disini...',
+                      maxLines: 5),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Maish kosong
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text(
+                        'Buat Rangkuman Penilaian',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hint,
+      {int maxLines = 1}) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isTeacher = widget.role == 'Guru';
     return Scaffold(
       backgroundColor: Color(0xFFEFF8FA),
       appBar: AppBar(
@@ -124,6 +223,14 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
           ],
         ),
       ),
+      floatingActionButton: isTeacher
+          ? FloatingActionButton(
+              onPressed: _showTambahRangkuman,
+              backgroundColor: Colors.blue,
+              child: const Icon(Icons.add, color: Colors.white),
+              shape: const CircleBorder(),
+            )
+          : null,
     );
   }
 
@@ -150,7 +257,11 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPenilaianPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              DetailPenilaianPage(role: widget.role)));
                 },
                 child: Text(
                   "Lihat Rincian",

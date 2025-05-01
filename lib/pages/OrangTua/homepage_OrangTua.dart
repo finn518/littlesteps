@@ -54,8 +54,12 @@ class _HomePageState extends State<HomePageOrangTua> {
           {
             'title': 'Informasi Anak',
             'onTap': () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => KeyAnakPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => KeyAnakPage(
+                            role: widget.role,
+                          )));
             }
           },
           {

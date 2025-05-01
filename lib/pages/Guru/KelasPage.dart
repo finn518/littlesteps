@@ -7,9 +7,13 @@ import 'siswa.dart';
 class KelasPage extends StatefulWidget {
   final String namaKelas;
   final List<Siswa> listSiswa;
+  final String role;
 
   const KelasPage(
-      {super.key, required this.namaKelas, required this.listSiswa});
+      {super.key,
+      required this.namaKelas,
+      required this.listSiswa,
+      required this.role});
 
   @override
   State<KelasPage> createState() => _KelasPageState();
@@ -92,7 +96,10 @@ class _KelasPageState extends State<KelasPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProfilSiswaPage(siswa: siswa),
+            builder: (context) => ProfilSiswaPage(
+              siswa: siswa,
+              role: widget.role,
+            ),
           ),
         );
       },

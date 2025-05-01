@@ -6,7 +6,8 @@ import 'package:littlesteps/pages/Guru/siswa.dart';
 import 'package:littlesteps/pages/OrangTua/jadwal_page.dart';
 
 class BerandaGuru extends StatelessWidget {
-  const BerandaGuru({super.key});
+  final String role;
+  const BerandaGuru({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +41,18 @@ class BerandaGuru extends StatelessWidget {
                       'Kelas A',
                       'assets/images/Kelas_A.png',
                       Colors.blue[100]!,
-                      KelasPage(namaKelas: 'Kelas A', listSiswa: siswaKelasA)),
+                      KelasPage(
+                          namaKelas: 'Kelas A',
+                          listSiswa: siswaKelasA,
+                          role: role)),
                   _classCard(
                       'Kelas B',
                       'assets/images/Kelas_B.png',
                       Colors.yellow[100]!,
-                      KelasPage(namaKelas: 'Kelas B', listSiswa: siswaKelasB)),
+                      KelasPage(
+                          namaKelas: 'Kelas B',
+                          listSiswa: siswaKelasB,
+                          role: role)),
                 ],
               ))
             ],
