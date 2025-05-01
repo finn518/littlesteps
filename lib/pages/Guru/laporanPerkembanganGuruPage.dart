@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:littlesteps/pages/ProfilSiswa/detaillaporanperkembangan_page.dart';
 
 class LaporanPerkembanganGuru extends StatefulWidget {
-  final bool? isTeacher;
-  const LaporanPerkembanganGuru({super.key, this.isTeacher});
+  final String role;
+  const LaporanPerkembanganGuru({super.key, required this.role});
 
   @override
   State<LaporanPerkembanganGuru> createState() =>
@@ -52,6 +52,7 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
                   controller: judul,
                   decoration: InputDecoration(
                     hintText: 'Judul Tema',
+                    hintStyle: TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -73,6 +74,7 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
                   controller: bulan,
                   decoration: InputDecoration(
                     hintText: 'Bulan Tema',
+                    hintStyle: TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -129,10 +131,16 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
 
   @override
   Widget build(BuildContext context) {
-    final isTeacher = widget.isTeacher == true;
+    final isTeacher = widget.role == "Guru";
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: IconButton(
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(
+              Icons.arrow_back,
+              size: 36,
+            )),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -162,7 +170,8 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
                   () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => DetailLaporanPerkembanganPage())),
+                          builder: (_) => DetailLaporanPerkembanganPage(
+                              role: widget.role))),
                 );
               },
             ),
@@ -177,7 +186,6 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
               shape: const CircleBorder(),
             )
           : null,
-
     );
   }
 

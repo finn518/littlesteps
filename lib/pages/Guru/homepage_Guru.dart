@@ -19,8 +19,20 @@ class HomepageGuru extends StatefulWidget {
 
 class _nameState extends State<HomepageGuru> {
   final authService = AuthService();
-  List<Widget> pages = [BerandaGuru(), GaleriGuruPage(), PesanPage()];
+  late List<Widget> pages;
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      BerandaGuru(
+        role: widget.role,
+      ),
+      GaleriGuruPage(),
+      PesanPage()
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
