@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart';
+
 import 'siswa.dart';
 
 class KelasPage extends StatefulWidget {
@@ -47,10 +49,10 @@ class _KelasPageState extends State<KelasPage> {
             begin: Alignment.bottomLeft,
             end: Alignment.topRight,
             colors: [
-              Color(0xff84CAFF),
+              Color(0xffD1E9FF),
               Colors.white,
               Colors.white,
-              Color(0xffFDE272),
+              Color(0xBFFEF7C3),
             ],
             stops: [0.0, 0.58, 0.67, 1],
           ),

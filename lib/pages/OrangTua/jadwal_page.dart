@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:littlesteps/widgets/appBackground.dart';
 
 class JadwalHarianPage extends StatefulWidget {
   const JadwalHarianPage({super.key});
@@ -29,28 +30,36 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: ListView(
-        children: [
-         CustomCalendar(),
+      extendBodyBehindAppBar: true,
+      body: AppBackground(
+        child: ListView(
+          children: [
+            CustomCalendar(),
             agenda("10.00 - 13.00", "Rapat Wali Murid", "Senin, 11-12-2024"),
             agenda("10.00 - 13.00", "Rapat Wali Murid", "Senin, 11-12-2024"),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => openBottomDrawer(context), 
-        child: Icon(Icons.add, size: 30, color: Colors.white,),
+        onPressed: () => openBottomDrawer(context),
+        child: Icon(
+          Icons.add,
+          size: 30,
+          color: Colors.white,
+        ),
         shape: CircleBorder(),
         backgroundColor: Color(0xff4285F4),
       ),
-
     );
   }
 
-void openBottomDrawer(BuildContext context) {
+  void openBottomDrawer(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, 
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -111,24 +120,27 @@ void openBottomDrawer(BuildContext context) {
                           // lakukan sesuatu dengan pickedDate, misalnya isi ke TextField
                         }
                       },
-                      icon: ImageIcon(AssetImage('assets/icons/calender.png'), color: Color(0xffC0C0C0),),
+                      icon: ImageIcon(
+                        AssetImage('assets/icons/calender.png'),
+                        color: Color(0xffC0C0C0),
+                      ),
                     ),
-                      border: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffC0C0C0), width: 0.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color(0xff4285F4),
-                            width: 1.5), // Warna border saat focused
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color(0xffC0C0C0),
-                            width: 0.5), // Warna border saat tidak focused
-                        borderRadius: BorderRadius.circular(10),
+                    border: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color(0xffC0C0C0), width: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color(0xff4285F4),
+                          width: 1.5), // Warna border saat focused
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color(0xffC0C0C0),
+                          width: 0.5), // Warna border saat tidak focused
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
@@ -174,7 +186,10 @@ void openBottomDrawer(BuildContext context) {
                           mainAxisAlignment: MainAxisAlignment
                               .start, // ini supaya isi rata kiri
                           children: [
-                            ImageIcon(AssetImage('assets/icons/Tugas_lingkaran.png'), color: Color(0xff4285F4),),
+                            ImageIcon(
+                              AssetImage('assets/icons/Tugas_lingkaran.png'),
+                              color: Color(0xff4285F4),
+                            ),
                             SizedBox(width: 8),
                             Text('Tugas'),
                           ],
@@ -198,7 +213,10 @@ void openBottomDrawer(BuildContext context) {
                           mainAxisAlignment: MainAxisAlignment
                               .start, // ini juga supaya isi rata kiri
                           children: [
-                            ImageIcon(AssetImage('assets/icons/Kegiatan_lingkaran.png'), color: Color(0xff00B383),),
+                            ImageIcon(
+                              AssetImage('assets/icons/Kegiatan_lingkaran.png'),
+                              color: Color(0xff00B383),
+                            ),
                             SizedBox(width: 8),
                             Text('Kegiatan'),
                           ],
@@ -208,7 +226,10 @@ void openBottomDrawer(BuildContext context) {
                   ],
                 ),
                 SizedBox(height: 20),
-                CustomButton(label: "Buat Jadwal", onPressed: () {},),
+                CustomButton(
+                  label: "Buat Jadwal",
+                  onPressed: () {},
+                ),
                 SizedBox(height: 20),
               ],
             ),
@@ -218,7 +239,7 @@ void openBottomDrawer(BuildContext context) {
     );
   }
 
-  Widget agenda(String time, String title, String date){
+  Widget agenda(String time, String title, String date) {
     return Card(
       color: Colors.white,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -270,7 +291,6 @@ void openBottomDrawer(BuildContext context) {
     );
   }
 
-
   Widget CustomCalendar() {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -315,10 +335,13 @@ void openBottomDrawer(BuildContext context) {
             focusedDay: _focusedDay,
             daysOfWeekHeight: 50,
             calendarStyle: CalendarStyle(
-              tablePadding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 20),
-              todayDecoration: ShapeDecoration(shape: CircleBorder(), color:  Color(0xff4285F4)),
-              selectedDecoration: ShapeDecoration(shape: CircleBorder(), color:  Color(0xff4285F4).withOpacity(0.5))
-            ),
+                tablePadding:
+                    EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 20),
+                todayDecoration: ShapeDecoration(
+                    shape: CircleBorder(), color: Color(0xff4285F4)),
+                selectedDecoration: ShapeDecoration(
+                    shape: CircleBorder(),
+                    color: Color(0xff4285F4).withOpacity(0.5))),
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
             },

@@ -11,48 +11,58 @@ class RolePage extends StatelessWidget {
     _deviceWidht = DeviceDimensions.width(context);
     _deviceHeight = DeviceDimensions.height(context);
     return SafeArea(
-      child: Container(
-        width: _deviceWidht,
-        height: _deviceHeight,
-        decoration: const BoxDecoration(
+        child: Container(
+      width: _deviceWidht,
+      height: _deviceHeight,
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomLeft,
           end: Alignment.topRight,
           colors: [
-            Color(0xff84CAFF),
+            Color(0xffD1E9FF),
             Colors.white, // Biru muda
             Colors.white, // Kuning pastel
-            Color(0xffFDE272),
+            Color(0xBFFEF7C3),
           ],
           stops: [0.0, 0.58, 0.67, 1],
         ),
       ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                Image.asset(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Image.asset(
                 "assets/images/LOGO_FINAL.png",
                 width: 200,
                 height: 200,
               ),
               Padding(
-                padding:  EdgeInsets.only(bottom: _deviceHeight * 0.012, top: _deviceHeight * 0.2), //Besok Ganti jadi device height * ...
+                padding: EdgeInsets.only(
+                    bottom: _deviceHeight * 0.012,
+                    top: _deviceHeight *
+                        0.2), //Besok Ganti jadi device height * ...
                 child: Text(
                   "Siapakah Anda ?",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
-              ],
-            ),
-            roleBtn("Pengajar", AuthGate(role: "Guru",)),
-            roleBtn("Orang Tua", AuthGate(role: "Orang Tua",)),
-          ],
-        ),
-      )
-    );
+            ],
+          ),
+          roleBtn(
+              "Pengajar",
+              AuthGate(
+                role: "Guru",
+              )),
+          roleBtn(
+              "Orang Tua",
+              AuthGate(
+                role: "Orang Tua",
+              )),
+        ],
+      ),
+    ));
   }
 
   Widget roleBtn(String name, Widget halaman) {
