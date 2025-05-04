@@ -6,6 +6,7 @@ import "package:littlesteps/pages/Guru/rangkumanKehadiran.dart";
 import "package:littlesteps/pages/Guru/siswa.dart";
 import "package:littlesteps/pages/ProfilSiswa/catatankesehatan_page.dart";
 import "package:littlesteps/pages/ProfilSiswa/rangkumanpenilaian_page.dart";
+import "package:littlesteps/utils/device_dimension.dart";
 import 'package:littlesteps/widgets/appBackground.dart';
 
 class ProfilSiswaPage extends StatelessWidget {
@@ -15,10 +16,10 @@ class ProfilSiswaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -31,6 +32,7 @@ class ProfilSiswaPage extends StatelessWidget {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: width * 0.075),
             child: Column(
               children: [
                 SizedBox(height: 20),
@@ -43,7 +45,10 @@ class ProfilSiswaPage extends StatelessWidget {
                 SizedBox(height: 25),
                 Text(
                   siswa.name,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontVariations: [FontVariation('wght', 800)],
+                  ),
                 ),
                 SizedBox(height: 30),
                 buildMenuButton("Catatan Kesehatan", Color(0xffB2DDFF), () {
@@ -78,7 +83,7 @@ class ProfilSiswaPage extends StatelessWidget {
                     ),
                   );
                 }),
-                SizedBox(height: MediaQuery.of(context).padding.bottom + 55),
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 100),
               ],
             ),
           ),
@@ -88,10 +93,11 @@ class ProfilSiswaPage extends StatelessWidget {
   }
 
   Widget buildMenuButton(String label, Color? color, VoidCallback callback) {
+
     return GestureDetector(
       onTap: callback,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 12, horizontal: 48),
+        margin: EdgeInsets.symmetric(vertical: 12),
         padding: EdgeInsets.symmetric(vertical: 24),
         decoration: BoxDecoration(
           color: color,
@@ -109,7 +115,7 @@ class ProfilSiswaPage extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w800,
+              fontVariations: [FontVariation('wght', 800)],
             ),
           ),
         ),

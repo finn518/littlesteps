@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class DetailLaporanPerkembanganPage extends StatefulWidget {
@@ -121,11 +122,11 @@ class _DetailLaporanPerkembanganPageState
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
     final isTeacher = widget.role == 'Guru';
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -133,13 +134,13 @@ class _DetailLaporanPerkembanganPageState
             )),
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 48),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.075),
         children: [
           Center(
             child: Text(
               "Laporan Perkembangan",
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 800)],
                 fontSize: 28,
                 color: Colors.black,
               ),
@@ -181,7 +182,11 @@ class _DetailLaporanPerkembanganPageState
     return Container(
       height: 90,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Text("Catatan:....", style: TextStyle(fontSize: 18)),
+      child: Text("Catatan:....",
+          style: TextStyle(
+              fontSize: 18,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500)),
     );
   }
 }

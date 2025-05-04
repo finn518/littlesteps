@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:littlesteps/pages/ProfilSiswa/detailpenilaian_page.dart';
+import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class RangkumanPerkembanganPage extends StatefulWidget {
@@ -45,7 +46,9 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
                 children: [
                   const Text(
                     'Buat Rangkuman\nPenilaian',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontVariations: [FontVariation('wght', 800)]),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -73,7 +76,7 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
                       child: const Text(
                         'Buat Rangkuman Penilaian',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontVariations: [FontVariation('wght', 800)],
                           color: Colors.white,
                           fontSize: 16,
                         ),
@@ -113,6 +116,7 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
     final isTeacher = widget.role == 'Guru';
     return Scaffold(
       backgroundColor: Color(0xFFEFF8FA),
@@ -120,7 +124,6 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
         backgroundColor: Color(0xFFEFF8FA),
         elevation: 0,
         leading: IconButton(
-          padding: EdgeInsets.symmetric(horizontal: 30),
           onPressed: () => Navigator.pop(context),
           icon: Icon(
             Icons.arrow_back,
@@ -130,14 +133,14 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 48),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.075),
         child: ListView(
           children: [
             Center(
               child: Text(
                 "Rangkuman Penilaian",
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontVariations: [FontVariation('wght', 800)],
                   fontSize: 28,
                   color: Colors.black,
                 ),
@@ -148,7 +151,10 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
               children: [
                 Text(
                   "Pilihan Semester : ",
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontVariations: [FontVariation('wght', 600)],
+                  ),
                 ),
                 SizedBox(width: 5),
                 Container(
@@ -158,7 +164,8 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  constraints: BoxConstraints(minWidth: 170, maxHeight: 30),
+                  constraints:
+                      BoxConstraints(minWidth: width * 0.45, maxHeight: 30),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: false, // Changed to false
@@ -194,7 +201,7 @@ class _RangkumanPerkembanganPageState extends State<RangkumanPerkembanganPage> {
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 25),
             if (selectedSemester != null) ...[
               CardCatatan(
                 number: 1,

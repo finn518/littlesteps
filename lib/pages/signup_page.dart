@@ -77,7 +77,6 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -88,10 +87,8 @@ class _SignupPageState extends State<SignupPage> {
           true, // biar scaffold menyesuaikan saat keyboard muncul
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-              left: width * 0.13,
-              right: width * 0.13,
-              bottom: MediaQuery.of(context).viewInsets.bottom), // ini penting
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.1, vertical: height * 0.01), // ini penting
           child: Column(
             mainAxisAlignment: MainAxisAlignment
                 .start, // jangan spaceBetween karena bakal tinggi banget
@@ -110,14 +107,23 @@ class _SignupPageState extends State<SignupPage> {
                    Center(
                         child: CustomTextField(
                             label: "Nama", controller: namaController)),
+                    SizedBox(
+                      height: 15,
+                    ),
                     Center(
                         child: CustomTextField(
                             label: "Surel", controller: emailController)),
+                    SizedBox(
+                      height: 15,
+                    ),
                     Center(
                         child: CustomTextField(
                             label: "Nomor Telepon",
                             isNumber: true,
                             controller: nomorteleponController)),
+                    SizedBox(
+                      height: 15,
+                    ),
                     Center(
                         child: CustomTextField(
                             label: "Kata Sandi",
@@ -131,7 +137,10 @@ class _SignupPageState extends State<SignupPage> {
                     Center(
                       child: Text(
                         "Atau lanjutkan dengan Google",
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400),
                       ),
                     ),
                     SizedBox(
@@ -152,7 +161,10 @@ class _SignupPageState extends State<SignupPage> {
                     Center(
                       child: Text(
                         "Apakah anda tidak memiliki akun",
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400),
                       ),
                     ),
                     CustomButton(

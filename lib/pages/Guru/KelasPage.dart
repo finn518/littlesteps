@@ -66,7 +66,7 @@ class _KelasPageState extends State<KelasPage> {
                   widget.namaKelas,
                   style: TextStyle(
                       color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                      fontVariations: [FontVariation('wght', 800)],
                       fontSize: MediaQuery.of(context).size.width * 0.08),
                 ),
                 const SizedBox(height: 16),
@@ -139,7 +139,7 @@ class _KelasPageState extends State<KelasPage> {
               siswa.name,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 700)],
                 fontSize: 14,
               ),
             ),
@@ -175,7 +175,9 @@ class _KelasPageState extends State<KelasPage> {
                     const Text(
                       'Buat Profil Siswa',
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          TextStyle(
+                          fontVariations: [FontVariation('wght', 800)],
+                          fontSize: 18),
                     ),
                     const SizedBox(height: 16),
                     TextField(

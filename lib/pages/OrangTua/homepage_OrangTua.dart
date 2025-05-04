@@ -1,13 +1,11 @@
 import "package:flutter/material.dart";
 import "package:littlesteps/pages/OrangTua/beranda.dart";
 import "package:littlesteps/pages/OrangTua/galeri_page.dart";
-import "package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart";
 import "package:littlesteps/pages/OrangTua/keyanak_page.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";
 import "package:littlesteps/pages/pesan_page.dart";
 import "package:littlesteps/utils/auth_service.dart";
-import "package:littlesteps/utils/device_dimension.dart";
 import "package:littlesteps/widgets/bottomNavbar.dart";
 import "package:littlesteps/widgets/customappbar.dart";
 import "package:littlesteps/widgets/customdrawer.dart";
@@ -15,7 +13,7 @@ import "package:littlesteps/widgets/customdrawer.dart";
 class HomePageOrangTua extends StatefulWidget {
   final String role;
   const HomePageOrangTua({super.key, required this.role});
-
+  
   @override
   State<HomePageOrangTua> createState() => _HomePageState();
 }
@@ -100,7 +98,7 @@ class _HomePageState extends State<HomePageOrangTua> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
-                  fontWeight: FontWeight.w900,
+                  fontVariations: [FontVariation('wght', 800)],
                 ),
               ),
               SizedBox(height: 10),
@@ -108,6 +106,7 @@ class _HomePageState extends State<HomePageOrangTua> {
                 "Semua perubahan yang belum\ndisimpan mungkin akan hilang",
                 textAlign: TextAlign.center,
                 style: TextStyle(
+                  fontVariations: [FontVariation('wght', 500)],
                   color: Colors.grey[600],
                   fontSize: 18,
                 ),
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePageOrangTua> {
                     },
                     child: Text("Ya",
                         style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontVariations: [FontVariation('wght', 800)],
                             color: Colors.white,
                             fontSize: 18)),
                   ),
@@ -149,7 +148,7 @@ class _HomePageState extends State<HomePageOrangTua> {
                     onPressed: () => Navigator.pop(context),
                     child: Text("Tidak",
                         style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontVariations: [FontVariation('wght', 800)],
                             color: Color(0xff0066FF),
                             fontSize: 18)),
                   ),

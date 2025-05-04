@@ -27,7 +27,10 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
         ),
         title: Text(
           "Jadwal Harian",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 28,
+            fontVariations: [FontVariation('wght', 800)],
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -76,7 +79,7 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
                     'Buat jadwal harian',
                     style: TextStyle(
                       fontSize: 30,
-                      fontWeight: FontWeight.bold,
+                      fontVariations: [FontVariation('wght', 800)],
                     ),
                   ),
                 ),
@@ -191,7 +194,12 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
                               color: Color(0xff4285F4),
                             ),
                             SizedBox(width: 8),
-                            Text('Tugas'),
+                            Text(
+                              'Tugas',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Poppins'),
+                            ),
                           ],
                         ),
                       ),
@@ -218,7 +226,12 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
                               color: Color(0xff00B383),
                             ),
                             SizedBox(width: 8),
-                            Text('Kegiatan'),
+                            Text(
+                              'Kegiatan',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Poppins'),
+                            ),
                           ],
                         ),
                       ),
@@ -261,7 +274,7 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontVariations: [FontVariation('wght', 700)],
                   ),
                 ),
                 Spacer(),
@@ -273,7 +286,7 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
               title,
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w800,
+                fontVariations: [FontVariation('wght', 700)],
                 color: Colors.black87,
               ),
             ),
@@ -283,6 +296,7 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
+                fontVariations: [FontVariation('wght', 500)],
               ),
             ),
           ],
@@ -306,7 +320,11 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
               children: [
                 Text(
                   DateFormat('MMMM yyyy').format(_focusedDay),
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Poppins',
+                  ),
                 ),
                 Row(
                   children: [

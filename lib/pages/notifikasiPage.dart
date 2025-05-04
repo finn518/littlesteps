@@ -28,7 +28,7 @@ class NotifikasiPage extends StatelessWidget {
                 role == "Guru" ? "Notifikasi Guru" : "Notifikasi Orang Tua",
                 style: TextStyle(
                     fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontVariations: [FontVariation('wght', 800)],
                     color: Colors.black),
               ),
             ),
@@ -91,13 +91,18 @@ class NotifikasiPage extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontVariations: [FontVariation('wght', 500)],
+                ),
                 textAlign: TextAlign.justify,
               ),
               const SizedBox(height: 4),
               Text(
                 time,
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontVariations: [FontVariation('wght', 600)],
+                ),
               )
             ],
           ))

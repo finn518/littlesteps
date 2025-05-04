@@ -81,7 +81,9 @@ class GaleriGuruPage extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                fontVariations: [FontVariation('wght', 800)],
+                color: Colors.black,
+                fontSize: 16),
           ),
         ],
       ),

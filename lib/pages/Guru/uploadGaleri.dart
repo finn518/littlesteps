@@ -66,7 +66,7 @@ class _UploadGaleriState extends State<UploadGaleri> {
             Text(
               label,
               style: TextStyle(
-                fontWeight: FontWeight.w600,
+                fontVariations: [FontVariation('wght', 800)],
                 color: labelColor,
               ),
             ),
@@ -91,7 +91,9 @@ class _UploadGaleriState extends State<UploadGaleri> {
         title: Text(
           "Upload",
           style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 26),
+              color: Colors.black,
+              fontVariations: [FontVariation('wght', 800)],
+              fontSize: 26),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -182,7 +184,7 @@ class _UploadGaleriState extends State<UploadGaleri> {
                   child: Text(
                     "Unggah",
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontVariations: [FontVariation('wght', 800)],
                         fontSize: 16,
                         color: Colors.white),
                   ),

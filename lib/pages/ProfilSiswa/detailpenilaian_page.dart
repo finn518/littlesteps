@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class DetailPenilaianPage extends StatefulWidget {
@@ -47,7 +48,9 @@ class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
                 children: [
                   const Text(
                     'Buat Penilaian Sub Kompetensi',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontVariations: [FontVariation('wght', 800)]),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -130,7 +133,7 @@ class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                              fontVariations: [FontVariation('wght', 800)])
                       ),
                     ),
                   ),
@@ -145,12 +148,11 @@ class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
     final isTeacher = widget.role == 'Guru';
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -158,13 +160,13 @@ class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
             )),
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 48),
+padding: EdgeInsets.symmetric(horizontal: width * 0.075),
         children: [
           Center(
             child: Text(
               "Laporan Penilaian",
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 800)],
                 fontSize: 28,
                 color: Colors.black,
               ),
@@ -175,7 +177,7 @@ class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
             child: Text(
               "Nilai Agama dan Moral",
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 800)],
                 fontSize: 26,
                 color: Color(0xff707070),
               ),
@@ -216,7 +218,10 @@ class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
         child: Center(
             child: Text(
           detail,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 18,
+            fontVariations: [FontVariation('wght', 800)],
+          ),
           textAlign: TextAlign.center,
         )));
   }

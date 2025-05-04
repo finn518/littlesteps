@@ -57,12 +57,11 @@ class PesanPage extends StatelessWidget {
     }
 
     return SingleChildScrollView(
-      // Wrap the entire body with SingleChildScrollView
       child: Column(
         children: [
           Padding(
             padding: EdgeInsets.symmetric(
-                horizontal: width * 0.1, vertical: height * 0.04),
+                horizontal: width * 0.06, vertical: height * 0.04),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
@@ -74,7 +73,7 @@ class PesanPage extends StatelessWidget {
                   ),
                 ],
               ),
-              width: width * 0.8,
+              width: double.infinity,
               height: width * 0.12,
               child: TextField(
                 decoration: InputDecoration(
@@ -108,7 +107,8 @@ class PesanPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   color: Color(0xFFFEF9E4),
-                  margin: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: width * 0.04, vertical: 5),
                   child: Padding(
                     padding: const EdgeInsets.all(15),
                     child: Row(
@@ -118,7 +118,8 @@ class PesanPage extends StatelessWidget {
                         Text(
                           "Pengumuman",
                           style: TextStyle(
-                              fontWeight: FontWeight.w800, fontSize: 18),
+                              fontVariations: [FontVariation('wght', 800)],
+                              fontSize: 18),
                         ),
                       ],
                     ),
@@ -126,10 +127,12 @@ class PesanPage extends StatelessWidget {
                 ),
               ),
               bubblePesan(
-                  "Bu Rani", "walaikumsalam", "kemarin", () => tochatpribadi(), "assets/images/Bu_cindy.png"),
+                  "Bu Rani", "walaikumsalam", "kemarin",
+                  () => tochatpribadi(), "assets/images/Bu_cindy.png", context),
               bubblePesan("Bu Sinta", "betul bu anak saya juga", "10:00",
-                  () => tochatpribadi(), "assets/images/Bu_mira.png"),
-              bubblePesan("Bu Cindy", "iya bu", "11:30", () => tochatpribadi(), "assets/images/Bu_rani.png"),
+                  () => tochatpribadi(), "assets/images/Bu_mira.png", context),
+              bubblePesan("Bu Cindy", "iya bu", "11:30", () => tochatpribadi(),
+                  "assets/images/Bu_rani.png", context),
             ],
           ),
         ],
@@ -138,7 +141,9 @@ class PesanPage extends StatelessWidget {
   }
 
   Widget bubblePesan(
-      String name, String pesan, String waktu, VoidCallback onTap, String imagePath) {
+      String name, String pesan, String waktu,
+      VoidCallback onTap, String imagePath, BuildContext context) {
+    final width = DeviceDimensions.width(context);
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -146,7 +151,7 @@ class PesanPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         color: Colors.white,
-        margin: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+        margin: EdgeInsets.symmetric(horizontal: width * 0.04, vertical: 10),
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Row(

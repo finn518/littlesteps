@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/utils/device_dimension.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
+    final height = DeviceDimensions.height(context);
     return Card(
       color: Colors.white,
-      margin: EdgeInsets.symmetric(vertical: 16, horizontal: 36),
+      margin: EdgeInsets.symmetric(vertical: height * 0.01),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20)
       ),
-      child: Padding(padding: EdgeInsets.only(left: 32, right: 32, top: 32, bottom: 24), child: Column(
+      child: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.06, vertical: height * 0.025),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
                 "Cerita",
                 textAlign: TextAlign.start,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                style: TextStyle(
+                    fontVariations: [FontVariation('wght', 800)], fontSize: 24),
               ),
               SizedBox(height: 10,),
               uploader(),
-              SizedBox(height: 10),
+              SizedBox(height: 15),
               foto(),
               SizedBox(height: 30),
               postAction()
@@ -43,8 +50,14 @@ class PostCard extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Prof. Alfin", style: TextStyle(fontWeight: FontWeight.bold)),
-            Text("28 - feb - 2025"),
+            Text("Prof. Alfin",
+                style: TextStyle(
+                  fontVariations: [FontVariation('wght', 800)],
+                )),
+            Text("28 - feb - 2025",
+                style: TextStyle(
+                  fontVariations: [FontVariation('wght', 800)],
+                )),
           ],
         ),
       ],
@@ -58,10 +71,13 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: Image.asset('assets/images/GAMBAR_UPLOAD_FEBRUARI.png'),
         ),
-        SizedBox(height: 20,),
+        SizedBox(
+          height: 10,
+        ),
         Text(
           "Foto Kegiatan Sekolah",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+              fontVariations: [FontVariation('wght', 800)], fontSize: 16),
         )
 
       ],
@@ -76,7 +92,11 @@ class PostCard extends StatelessWidget {
           children: [
             ImageIcon(AssetImage('assets/icons/suka.png')),
             SizedBox(width: 10),
-            Text("Suka", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),),
+            Text("Suka",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontVariations: [FontVariation('wght', 800)],
+                )),
           ],
         ),
         Row(
@@ -84,7 +104,10 @@ class PostCard extends StatelessWidget {
             ImageIcon(AssetImage('assets/icons/komen.png')),
             SizedBox(width: 10),
             Text("Comment",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontVariations: [FontVariation('wght', 800)],
+                )),
           ],
         ),
       ],

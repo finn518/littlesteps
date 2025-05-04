@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:littlesteps/utils/device_dimension.dart';
 
 class CustomBottomNavbar extends StatefulWidget {
   final int currentIndex;
@@ -31,29 +30,60 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: BottomNavigationBar(
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        selectedItemColor: Color(0xff0066FF),
-        currentIndex: _selectedIndex, // Use _selectedIndex here
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/icons/beranda_select.png'),),
-            label: "Beranda",
-          ),
-          BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/icons/galeri_select.png')),
-            label: "Galeri",
-          ),
-          BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/icons/pesan_select.png')),
-            label: "Pesan",
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.grey.shade300, width: 1),
+        ),
+      ),
+      child: SizedBox(
+        height: 80,
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed, // menjaga posisi tetap
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          selectedItemColor: const Color(0xff0066FF),
+          unselectedItemColor: Colors.black,
+          selectedIconTheme: const IconThemeData(size: 24),
+          unselectedIconTheme: const IconThemeData(size: 24),
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Image.asset(
+                  _selectedIndex == 0
+                      ? 'assets/icons/beranda_select.png'
+                      : 'assets/icons/Beranda_abu.png',
+                  width: 24,
+                  height: 24,
+                  color: _selectedIndex == 0
+                      ? null
+                      : Colors.black, // warna saat belum dipilih
+                ),
+              ),
+              label: "Beranda",
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: ImageIcon(AssetImage('assets/icons/galeri_select.png')),
+              ),
+              label: "Galeri",
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: ImageIcon(AssetImage('assets/icons/pesan_select.png')),
+              ),
+              label: "Pesan",
+            ),
+          ],
+        ),
       ),
     );
   }
+
+
 }
