@@ -13,7 +13,11 @@ class ResetPasswordPage extends StatelessWidget {
     final nomorController = TextEditingController();
     return ResetPasswordFlow(title: "Lupa Kata Sandi?",
     subtitle: "Tidak perlu khawatir, kami mengerti ini bisa terjadi pada siapa saja. masukkan nomor telepon Anda untuk menerima kode OTP dan masuk kembali.",
-    body: CustomTextField(label: "Nomor Telepon", controller: nomorController),
+      body: CustomTextField(
+        label: "Nomor Telepon",
+        controller: nomorController,
+        isNumber: true,
+      ),
     buttonText: "Lanjutkan",
     onButtonPressed: () {
       Navigator.push(context, MaterialPageRoute(builder: (_) => VerifyOtpPage(role: role,)));

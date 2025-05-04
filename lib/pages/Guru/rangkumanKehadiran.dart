@@ -19,7 +19,7 @@ class RangkumanKehadiran extends StatelessWidget {
             child: Text(
               'Semester $semester',
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 800)],
                 fontSize: 16,
               ),
             ),
@@ -29,10 +29,30 @@ class RangkumanKehadiran extends StatelessWidget {
             color: Colors.black,
             thickness: 1.5,
           ),
-          const Text('Hadir : '),
-          const Text('Sakit : '),
-          const Text('Izin : '),
-          const Text('Alpa : '),
+          const Text(
+            'Hadir : ',
+            style: TextStyle(
+              fontVariations: [FontVariation('wght', 600)],
+            ),
+          ),
+          const Text(
+            'Sakit : ',
+            style: TextStyle(
+              fontVariations: [FontVariation('wght', 600)],
+            ),
+          ),
+          const Text(
+            'Izin : ',
+            style: TextStyle(
+              fontVariations: [FontVariation('wght', 600)],
+            ),
+          ),
+          const Text(
+            'Alpa : ',
+            style: TextStyle(
+              fontVariations: [FontVariation('wght', 600)],
+            ),
+          ),
         ],
       ),
     );
@@ -42,7 +62,12 @@ class RangkumanKehadiran extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(
+              Icons.arrow_back,
+              size: 36,
+            )),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -51,7 +76,8 @@ class RangkumanKehadiran extends StatelessWidget {
         children: [
           const Text(
             'Rangkuman Kehadiran',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            style: TextStyle(
+                fontVariations: [FontVariation('wght', 800)], fontSize: 24),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),

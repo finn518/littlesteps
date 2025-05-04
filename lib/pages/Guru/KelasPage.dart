@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart';
+
 import 'siswa.dart';
 
 class KelasPage extends StatefulWidget {
@@ -47,10 +49,10 @@ class _KelasPageState extends State<KelasPage> {
             begin: Alignment.bottomLeft,
             end: Alignment.topRight,
             colors: [
-              Color(0xff84CAFF),
+              Color(0xffD1E9FF),
               Colors.white,
               Colors.white,
-              Color(0xffFDE272),
+              Color(0xBFFEF7C3),
             ],
             stops: [0.0, 0.58, 0.67, 1],
           ),
@@ -64,7 +66,7 @@ class _KelasPageState extends State<KelasPage> {
                   widget.namaKelas,
                   style: TextStyle(
                       color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                      fontVariations: [FontVariation('wght', 800)],
                       fontSize: MediaQuery.of(context).size.width * 0.08),
                 ),
                 const SizedBox(height: 16),
@@ -137,7 +139,7 @@ class _KelasPageState extends State<KelasPage> {
               siswa.name,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 700)],
                 fontSize: 14,
               ),
             ),
@@ -173,7 +175,9 @@ class _KelasPageState extends State<KelasPage> {
                     const Text(
                       'Buat Profil Siswa',
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          TextStyle(
+                          fontVariations: [FontVariation('wght', 800)],
+                          fontSize: 18),
                     ),
                     const SizedBox(height: 16),
                     TextField(

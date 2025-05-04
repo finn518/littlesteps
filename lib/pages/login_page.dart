@@ -67,7 +67,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -77,10 +76,8 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-              left: width * 0.13,
-              right: width * 0.13,
-              bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.1, vertical: height * 0.01),
           child: Column(
             children: [
               SizedBox(
@@ -91,7 +88,10 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text(
                         "Masuk",
                         style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.w800),
+                          // fontFamily: 'Inter',
+                          fontSize: 32,
+                          fontVariations: [FontVariation('wght', 800)],
+                        ),
                       ),
                     ),
                     Center(
@@ -99,15 +99,20 @@ class _LoginPageState extends State<LoginPage> {
                       label: "Surel atau Nomor Telepon",
                       controller: emailController,
                     )),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Center(
                         child: CustomTextField(
                       label: "Kata Sandi",
                       isPassword: true,
                       controller: passwordController,
                     )),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: height * 0.015, left: height * 0.2),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -119,18 +124,24 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           );
                         },
-                        child: Text("Lupa Kata Sandi ?",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xff0066FF),
-                                fontWeight: FontWeight.bold)),
+                        child: Text(
+                          "Lupa Kata Sandi ?",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xff0066FF),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     CustomButton(label: "Masuk", onPressed: login),
                     Center(
                       child: Text(
                         "Atau lanjutkan dengan Google",
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400),
                       ),
                     ),
                     SizedBox(
@@ -151,7 +162,10 @@ class _LoginPageState extends State<LoginPage> {
                     Center(
                       child: Text(
                         "Apakah anda tidak memiliki akun",
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400),
                       ),
                     ),
                     CustomButton(

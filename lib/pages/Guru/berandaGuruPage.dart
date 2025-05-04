@@ -4,6 +4,7 @@ import 'package:littlesteps/pages/Guru/KelasPage.dart';
 import 'package:littlesteps/pages/Guru/koneksiSiswaPage.dart';
 import 'package:littlesteps/pages/Guru/siswa.dart';
 import 'package:littlesteps/pages/OrangTua/jadwal_page.dart';
+import 'package:littlesteps/utils/device_dimension.dart';
 
 class BerandaGuru extends StatelessWidget {
   final String role;
@@ -11,9 +12,12 @@ class BerandaGuru extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
+    final height = DeviceDimensions.height(context);
     return SafeArea(
       child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.04, vertical: height * 0.01),
           child: Column(
             children: [
               Row(
@@ -98,7 +102,7 @@ class BerandaGuru extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.black,
-                        fontWeight: FontWeight.bold,
+                        fontVariations: [FontVariation('wght', 700)],
                       ),
                     ),
                   )
@@ -149,7 +153,10 @@ class BerandaGuru extends StatelessWidget {
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
                     name,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontVariations: [FontVariation('wght', 800)],
+                    ),
                   ),
                 ),
               ],

@@ -51,7 +51,7 @@ class CardCatatan extends StatelessWidget {
               child: Text(
                 number.toString(),
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontVariations: [FontVariation('wght', 500)],
                   fontSize: 20,
                 ),
               ),
@@ -64,7 +64,7 @@ class CardCatatan extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontVariations: [FontVariation('wght', 700)],
                     fontSize: 20,
                   ),
                 ),
@@ -110,7 +110,7 @@ class CardCatatan extends StatelessWidget {
               child: Text(
                 number.toString(),
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontVariations: [FontVariation('wght', 500)],
                   fontSize: 20,
                 ),
               ),
