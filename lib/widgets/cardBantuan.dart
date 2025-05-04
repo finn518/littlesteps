@@ -20,9 +20,20 @@ class CardBantuan extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Q: ${question}', style: TextStyle(fontSize: 16),),
+            Text(
+              'Q: $question',
+              style: TextStyle(
+                fontSize: 16,
+                fontVariations: [FontVariation('wght', 500)],
+              ),
+            ),
             SizedBox(height: 20,),
-            Text("A: ${answer}", style: TextStyle(fontSize: 16),
+            Text(
+              "A: $answer",
+              style: TextStyle(
+                fontSize: 16,
+                fontVariations: [FontVariation('wght', 500)],
+              ),
             )
           ],
         ),

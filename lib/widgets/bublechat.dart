@@ -62,7 +62,10 @@ class BubbleChat extends StatelessWidget {
                 )
               : Text(
                   message,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Poppins'),
                 ),
         ),
         Padding(
@@ -73,7 +76,8 @@ class BubbleChat extends StatelessWidget {
             style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xff8A9099),
-                fontWeight: FontWeight.w500),
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins'),
           ),
         ),
       ],

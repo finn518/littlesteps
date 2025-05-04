@@ -94,7 +94,7 @@ class _nameState extends State<HomepageGuru> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
-                  fontWeight: FontWeight.w900,
+                  fontVariations: [FontVariation('wght', 800)]
                 ),
               ),
               SizedBox(height: 10),
@@ -102,7 +102,7 @@ class _nameState extends State<HomepageGuru> {
                 "Semua perubahan yang belum\ndisimpan mungkin akan hilang",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  fontVariations: [FontVariation('wght', 500)],
                   fontSize: 18,
                 ),
               ),
@@ -126,7 +126,7 @@ class _nameState extends State<HomepageGuru> {
                     },
                     child: Text("Ya",
                         style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontVariations: [FontVariation('wght', 800)],
                             color: Colors.white,
                             fontSize: 18)),
                   ),
@@ -143,7 +143,7 @@ class _nameState extends State<HomepageGuru> {
                     onPressed: () => Navigator.pop(context),
                     child: Text("Tidak",
                         style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontVariations: [FontVariation('wght', 800)],
                             color: Color(0xff0066FF),
                             fontSize: 18)),
                   ),

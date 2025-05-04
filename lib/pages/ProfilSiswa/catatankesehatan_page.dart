@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class CatatankesehatanPage extends StatefulWidget {
@@ -43,7 +44,9 @@ class _CatatankesehatanPageState extends State<CatatankesehatanPage> {
                 children: [
                   const Text(
                     'Buat Catatan Kesehatan',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontVariations: [FontVariation('wght', 800)]),
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(judul, 'Tulis judul semester disini...', ''),
@@ -74,7 +77,7 @@ class _CatatankesehatanPageState extends State<CatatankesehatanPage> {
                         'Buat Catatan Kesehatan',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontVariations: [FontVariation('wght', 800)],
                           color: Colors.white,
                           fontSize: 16,
                         ),
@@ -119,11 +122,11 @@ class _CatatankesehatanPageState extends State<CatatankesehatanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final width = DeviceDimensions.width(context);
     final isTeacher = widget.role == 'Guru';
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -131,13 +134,13 @@ class _CatatankesehatanPageState extends State<CatatankesehatanPage> {
             )),
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 48),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.075),
         children: [
           Center(
             child: Text(
               "Catatan Kesehatan",
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontVariations: [FontVariation('wght', 800)],
                 fontSize: 28,
                 color: Colors.black,
               ),
@@ -181,11 +184,23 @@ class _CatatankesehatanPageState extends State<CatatankesehatanPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Lingkaran Kepala :", style: TextStyle(fontSize: 14)),
+          Text("Lingkaran Kepala :",
+              style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500)),
           SizedBox(height: 4),
-          Text("Tinggi Badan :", style: TextStyle(fontSize: 14)),
+          Text("Tinggi Badan :",
+              style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500)),
           SizedBox(height: 4),
-          Text("Berat Badan :", style: TextStyle(fontSize: 14)),
+          Text("Berat Badan :",
+              style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500)),
         ],
       ),
     );

@@ -39,7 +39,7 @@ class CustomDrawer extends StatelessWidget {
                   namaUser,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontVariations: [FontVariation('wght', 800)],
                   ),
                 ),
               ],
@@ -52,8 +52,9 @@ class CustomDrawer extends StatelessWidget {
                   child: Text(
                     item['title'],
                     style: const TextStyle(
+                      fontFamily: 'Poppins',
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),

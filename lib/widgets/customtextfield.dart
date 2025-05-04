@@ -27,16 +27,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
     double width = DeviceDimensions.width(context);
     double height = DeviceDimensions.height(context);
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: height * 0.008),
-      child: Column(
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             widget.label,
             style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
+            fontFamily: 'Poppins',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
               color: Color(0xff2A5677),
             ),
           ),
@@ -66,6 +65,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   borderRadius: BorderRadius.circular(15),
                   borderSide: BorderSide(color: Color(0xff2A5677), width: 1.5),
                 ),
+              contentPadding: EdgeInsets.symmetric(
+                  vertical: height * 0.001, horizontal: width * 0.04), 
                 suffixIcon: widget.isPassword
                     ? IconButton(
                         onPressed: () {
@@ -82,8 +83,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

@@ -24,8 +24,7 @@ class BantuanPage extends StatelessWidget {
     ];
     return Scaffold(
        appBar: AppBar(
-        leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
+          leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -33,7 +32,8 @@ class BantuanPage extends StatelessWidget {
             )),
         title: Text(
             "Bantuan",
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 28),
+            style: TextStyle(
+                fontVariations: [FontVariation('wght', 800)], fontSize: 28),
           ),
           centerTitle: true,
       ),

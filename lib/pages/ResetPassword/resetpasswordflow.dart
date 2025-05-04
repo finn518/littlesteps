@@ -27,7 +27,6 @@ class ResetPasswordFlow extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          padding: EdgeInsets.symmetric(horizontal: 30),
           onPressed: () => Navigator.pop(context),
           icon: Icon(
             Icons.arrow_back,
@@ -35,24 +34,30 @@ class ResetPasswordFlow extends StatelessWidget {
           ),
         ),
       ),
-      body: Padding(
+      body: Container(
         padding: EdgeInsets.symmetric(
-            horizontal: width * 0.12, vertical: height * 0.02),
+            horizontal: width * 0.075, vertical: height * 0.01),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+              style: const TextStyle(
+                fontSize: 30,
+                fontVariations: [FontVariation('wght', 800)],
+              ),
             ),
             if (subtitle != null) ...[
               const SizedBox(height: 10),
               Text(
                 subtitle!,
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400),
               ),
             ],
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             if (body != null) body!,
             CustomButton(
               label: buttonText,

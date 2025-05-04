@@ -12,8 +12,7 @@ class RoomChatPage extends StatelessWidget {
         final height = DeviceDimensions.height(context);
         return Scaffold(
             appBar: AppBar(
-            leading: IconButton(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+        leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(
                 Icons.arrow_back,
@@ -36,7 +35,7 @@ class RoomChatPage extends StatelessWidget {
                 Text(
                 isAnounce ? "Pengumuman Kelas" : "Bu Rani",
                 style: const TextStyle(
-                    fontWeight: FontWeight.w800,
+                fontVariations: [FontVariation('wght', 800)],
                     fontSize: 18,
                 ),
                 ),
@@ -48,7 +47,14 @@ class RoomChatPage extends StatelessWidget {
             children: [
             Padding(
             padding: const EdgeInsets.only(top: 16),
-            child: Text("Hari ini", style: TextStyle(fontSize: 16, color: Color(0xff8A9099), fontWeight: FontWeight.w500),),
+            child: Text(
+              "Hari ini",
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xff8A9099),
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Poppins'),
+            ),
             ),
             Expanded(
                 child: ListView.builder(
@@ -74,9 +80,10 @@ class RoomChatPage extends StatelessWidget {
                         child: Text(
                         "Hanya guru di sekolah Anda yang dapat mengirim pengumuman",
                         style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Color(0xff8A9099),
-                            fontWeight: FontWeight.bold
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600
                         ),
                         textAlign: TextAlign.center,
                         ),

@@ -21,13 +21,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
      appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
               size: 36,
             )),
-            title: Text("Edit Profile", style: TextStyle(fontWeight: FontWeight.w800),),
+        title: Text(
+          "Edit Profil",
+          style: TextStyle(
+            fontVariations: [FontVariation('wght', 800)],
+          ),
+        ),
             centerTitle: true,
             backgroundColor: Color(0xffB2DDFF),
       ),
@@ -36,15 +40,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
           children: [
            editprofil(width),
            Container(
-            padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.12, vertical: height * 0.02),
+              margin: EdgeInsets.symmetric(
+                  horizontal: width * 0.14, vertical: height * 0.01),
              child: Column(
               children: [
                 CustomTextField(label: "Nama", controller: namaController),
-                CustomTextField(label: "Email", controller: namaController),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  CustomTextField(label: "Surel", controller: namaController),
+                  SizedBox(
+                    height: 20,
+                  ),
                 CustomTextField(label: "Nomor Telepon", controller: namaController),
-                SizedBox(height: 30),
-                CustomButton(label: "Edit Profile", onPressed: () {},)
+                  SizedBox(height: 5),
+                  CustomButton(
+                    label: "Edit Profil",
+                    onPressed: () {},
+                  )
               ],
              ),
            ),

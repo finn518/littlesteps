@@ -44,7 +44,10 @@ class RolePage extends StatelessWidget {
                         0.2), //Besok Ganti jadi device height * ...
                 child: Text(
                   "Siapakah Anda ?",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontVariations: [FontVariation('wght', 800)],
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -94,7 +97,8 @@ class RolePage extends StatelessWidget {
               name,
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),

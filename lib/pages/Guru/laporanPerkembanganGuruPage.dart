@@ -44,7 +44,9 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
               children: [
                 const Text(
                   'Buat Tema\nLaporan Perkembangan',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontVariations: [FontVariation('wght', 800)]),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -114,7 +116,7 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
                     child: const Text(
                       'Buat Tema Laporan',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontVariations: [FontVariation('wght', 800)],
                         color: Colors.white,
                         fontSize: 16,
                       ),
@@ -135,7 +137,6 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back,
@@ -152,7 +153,8 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
             child: Center(
               child: Text(
                 'Laporan Perkembangan',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                style: TextStyle(
+                    fontVariations: [FontVariation('wght', 800)], fontSize: 24),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -210,10 +212,14 @@ class _LaporanPerkembanganGuruState extends State<LaporanPerkembanganGuru> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text('Tema : $judul',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+                style: TextStyle(
+                    fontVariations: [FontVariation('wght', 800)],
+                    fontSize: 22)),
             const SizedBox(height: 25),
             Text('Bulan : $bulan',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: TextStyle(
+                    fontVariations: [FontVariation('wght', 800)],
+                    fontSize: 16)),
           ],
         ),
       ),
