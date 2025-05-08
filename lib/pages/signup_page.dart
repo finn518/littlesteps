@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
+import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/utils/auth_service.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
 import 'package:littlesteps/widgets/customtextfield.dart';
-import 'package:littlesteps/utils/auth_gate.dart';
 
 class SignupPage extends StatefulWidget {
   final String role;
@@ -31,35 +32,64 @@ class _SignupPageState extends State<SignupPage> {
     final nama = namaController.text;
     final nomor = nomorteleponController.text;
 
+    if (nama.isEmpty || email.isEmpty || password.isEmpty || nomor.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Semua field harus diisi')),
+      );
+      return;
+    }
+
     try {
-      await authService.signUpWithEmail(email: email, password: password, name: nama, nomer: nomor, role: widget.role);
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AuthGate(role: widget.role),
+      final user = await AuthService().signUpWithEmail(
+        email,
+        password,
+      );
+
+      if (user != null) {
+        await AuthService()
+            .saveUserData(user.uid, nama, email, nomor, widget.role);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Berhasil registrasi. Silahkan Verifikasi Email Anda',
+            ),
           ),
         );
+
+        Navigator.pop(context);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("$e")));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+        ),
+      );
     }
+     
   }
 
   void loginGoogle(String role) async {
     try {
       await authService.signInWithGoogle(role: role);
       if (mounted) {
-        // Ganti halaman jika berhasil login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AuthGate(role: widget.role),
-          ),
-        ); // atau halaman tujuanmu
+        if (widget.role == 'Guru') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomepageGuru(role: widget.role),
+            ),
+          );
+        } else if (widget.role == "Orang Tua") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePageOrangTua(role: widget.role),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

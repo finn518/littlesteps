@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:littlesteps/pages/role_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:littlesteps/pages/splash_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -30,10 +30,10 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Inter',
             scaffoldBackgroundColor: Color(0xffF3FAFB),
             appBarTheme: AppBarTheme(backgroundColor: Color(0xffF3FAFB))),
-        home: Scaffold(
-          body: Center(
-            child: RolePage(),
-          ),
-        ));
+        home: SplashScreen()
+    );
   }
 }
+
+        // body: Center(child: RolePage(),),
+

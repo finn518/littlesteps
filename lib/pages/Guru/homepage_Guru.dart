@@ -1,8 +1,11 @@
+import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter/material.dart';
 import "package:littlesteps/pages/Guru/berandaGuruPage.dart";
 import "package:littlesteps/pages/Guru/galeriGuruPage.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";
+import "package:littlesteps/pages/login_page.dart";
 import "package:littlesteps/pages/pesan_page.dart";
 import "package:littlesteps/utils/auth_service.dart";
 import "package:littlesteps/widgets/bottomNavbar.dart";
@@ -14,11 +17,13 @@ class HomepageGuru extends StatefulWidget {
   const HomepageGuru({super.key, required this.role});
 
   @override
-  State<HomepageGuru> createState() => _nameState();
+  State<HomepageGuru> createState() => _HomepageGuruState();
 }
 
-class _nameState extends State<HomepageGuru> {
+class _HomepageGuruState extends State<HomepageGuru> {
   final authService = AuthService();
+  User? _user;
+  String namaUser = "Memuat...";
   late List<Widget> pages;
   int _selectedIndex = 0;
 
@@ -26,12 +31,11 @@ class _nameState extends State<HomepageGuru> {
   void initState() {
     super.initState();
     pages = [
-      BerandaGuru(
-        role: widget.role,
-      ),
+      BerandaGuru(role: widget.role),
       GaleriGuruPage(),
-      PesanPage()
+      PesanPage(),
     ];
+    _loadUserData();
   }
 
   void _onItemTapped(int index) {
@@ -40,40 +44,32 @@ class _nameState extends State<HomepageGuru> {
     });
   }
 
-  void logout() async {
-    await authService.signOut();
+  void _loadUserData() async {
+    _user = authService.currentUser;
+    if (_user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .get();
+      final data = doc.data();
+      if (data != null) {
+        setState(() {
+          namaUser = data['name'] ?? 'Pengguna';
+        });
+      }
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.lerp(Color(0xff53B1FD), Colors.white, 0.9),
-      appBar: CustomAppbar(role: widget.role),
-      drawer: CustomDrawer(namaUser: "Bu Rani", menuItems: [
-        {
-          'title': 'Profil',
-          'onTap': () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EditProfilePage()));
-          }
-        },
-        {
-          'title': 'Bantuan',
-          'onTap': () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => BantuanPage()));
-          }
-        },
-        {
-          'title': 'Keluar Akun',
-          'onTap': () => showLogoutDialog(context),
-        },
-      ]),
-      body: SafeArea(child: pages[_selectedIndex]),
-      bottomNavigationBar: CustomBottomNavbar(
-        currentIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+  void logout() async {
+    await authService.signOut();
+    if (!context.mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginPage(role: widget.role),
       ),
+      (route) => false,
     );
   }
 
@@ -85,20 +81,20 @@ class _nameState extends State<HomepageGuru> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          contentPadding: EdgeInsets.all(24),
+          contentPadding: const EdgeInsets.all(24),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 "Apakah Anda yakin\ningin keluar akun?",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
-                  fontVariations: [FontVariation('wght', 800)]
+                  fontVariations: [FontVariation('wght', 800)],
                 ),
               ),
-              SizedBox(height: 10),
-              Text(
+              const SizedBox(height: 10),
+              const Text(
                 "Semua perubahan yang belum\ndisimpan mungkin akan hilang",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -106,42 +102,41 @@ class _nameState extends State<HomepageGuru> {
                   fontSize: 18,
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Tombol Ya
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Color(0xff0066FF),
+                      backgroundColor: const Color(0xff0066FF),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
                     ),
                     onPressed: () {
                       Navigator.pop(context); // tutup dialog
-                      // Aksi logout
                       logout();
                     },
-                    child: Text("Ya",
+                    child: const Text("Ya",
                         style: TextStyle(
                             fontVariations: [FontVariation('wght', 800)],
                             color: Colors.white,
                             fontSize: 18)),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   // Tombol Tidak
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black),
+                      side: const BorderSide(color: Colors.black),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: Text("Tidak",
+                    child: const Text("Tidak",
                         style: TextStyle(
                             fontVariations: [FontVariation('wght', 800)],
                             color: Color(0xff0066FF),
@@ -153,6 +148,45 @@ class _nameState extends State<HomepageGuru> {
           ),
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color.lerp(const Color(0xff53B1FD), Colors.white, 0.9),
+      appBar: CustomAppbar(role: widget.role),
+      drawer: CustomDrawer(namaUser: namaUser, menuItems: [
+        {
+          'title': 'Profil',
+          'onTap': () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditProfilePage(role: widget.role),
+              ),
+            );
+          },
+        },
+        {
+          'title': 'Bantuan',
+          'onTap': () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => BantuanPage()),
+            );
+          },
+        },
+        {
+          'title': 'Keluar Akun',
+          'onTap': () => showLogoutDialog(context),
+        },
+      ]),
+      body: SafeArea(child: pages[_selectedIndex]),
+      bottomNavigationBar: CustomBottomNavbar(
+        currentIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
+      ),
     );
   }
 }
