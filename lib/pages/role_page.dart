@@ -1,109 +1,109 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:littlesteps/utils/auth_gate.dart';
+import 'package:littlesteps/pages/login_page.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 
-class RolePage extends StatelessWidget {
-  RolePage({super.key});
-  late final _deviceWidht, _deviceHeight;
+class RolePage extends StatefulWidget {
+  const RolePage({Key? key}) : super(key: key);
+
+  @override
+  State<RolePage> createState() => _RolePageState();
+}
+
+class _RolePageState extends State<RolePage> {
+  double _deviceWidth = 0;
+  double _deviceHeight = 0;
 
   @override
   Widget build(BuildContext context) {
-    _deviceWidht = DeviceDimensions.width(context);
+    _deviceWidth = DeviceDimensions.width(context);
     _deviceHeight = DeviceDimensions.height(context);
-    return SafeArea(
+    return Scaffold(
+      body: SafeArea(
         child: Container(
-      width: _deviceWidht,
-      height: _deviceHeight,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomLeft,
-          end: Alignment.topRight,
-          colors: [
-            Color(0xffD1E9FF),
-            Colors.white, // Biru muda
-            Colors.white, // Kuning pastel
-            Color(0xBFFEF7C3),
-          ],
-          stops: [0.0, 0.58, 0.67, 1],
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Stack(
+          width: _deviceWidth,
+          height: _deviceHeight,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              colors: [
+                Color(0xffD1E9FF),
+                Colors.white,
+                Colors.white,
+                Color(0xBFFEF7C3),
+              ],
+              stops: [0.0, 0.58, 0.67, 1],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.asset(
-                "assets/images/LOGO_FINAL.png",
-                width: 200,
-                height: 200,
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    bottom: _deviceHeight * 0.012,
-                    top: _deviceHeight *
-                        0.2), //Besok Ganti jadi device height * ...
-                child: Text(
-                  "Siapakah Anda ?",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontVariations: [FontVariation('wght', 800)],
+              Stack(
+                children: [
+                  Image.asset(
+                    "assets/images/LOGO_FINAL.png",
+                    width: 300,
+                    height: 200,
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: _deviceHeight * 0.012,
+                      left: _deviceWidth * 0.1,
+                      top: _deviceHeight * 0.18,
+                    ),
+                    child: const Text(
+                      "Siapakah Anda ?",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontVariations: [FontVariation('wght', 800)],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
+              roleBtn("Guru"),
+              roleBtn("Orang Tua"),
             ],
           ),
-          roleBtn(
-              "Pengajar",
-              AuthGate(
-                role: "Guru",
-              )),
-          roleBtn(
-              "Orang Tua",
-              AuthGate(
-                role: "Orang Tua",
-              )),
-        ],
+        ),
       ),
-    ));
+    );
   }
 
-  Widget roleBtn(String name, Widget halaman) {
-    return Builder(
-      builder: (context) {
-        return Container(
-          margin: EdgeInsets.symmetric(vertical: _deviceHeight * 0.01),
-          width: 300,
-          height: 60,
-          child: OutlinedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => halaman),
-              );
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.black,
-              side: BorderSide(color: Color(0xFF53B1FD), width: 2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: _deviceHeight * 0.013,
-                vertical: _deviceHeight * 0.018,
-              ),
-            ),
-            child: Text(
-              name,
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+  Widget roleBtn(String name) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: _deviceHeight * 0.01),
+      width: 300,
+      height: 60,
+      child: OutlinedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage(role: name)),
+          );
+        },
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.black,
+          side: const BorderSide(color: Color(0xFF53B1FD), width: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-        );
-      },
+          padding: EdgeInsets.symmetric(
+            horizontal: _deviceHeight * 0.013,
+            vertical: _deviceHeight * 0.018,
+          ),
+        ),
+        child: Text(
+          name,
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: "Poppins",
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
     );
   }
 }

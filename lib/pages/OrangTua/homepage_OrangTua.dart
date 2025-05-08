@@ -1,9 +1,12 @@
+import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:littlesteps/pages/OrangTua/beranda.dart";
 import "package:littlesteps/pages/OrangTua/galeri_page.dart";
 import "package:littlesteps/pages/OrangTua/keyanak_page.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";
+import "package:littlesteps/pages/login_page.dart";
 import "package:littlesteps/pages/pesan_page.dart";
 import "package:littlesteps/utils/auth_service.dart";
 import "package:littlesteps/widgets/bottomNavbar.dart";
@@ -20,6 +23,8 @@ class HomePageOrangTua extends StatefulWidget {
 
 class _HomePageState extends State<HomePageOrangTua> {
   final authService = AuthService();
+  User? _user;
+  String namaUser = "pengguna";
   List<Widget> pages = [Beranda(), GaleriPage(), PesanPage()];
   int _selectedIndex = 0;
 
@@ -31,6 +36,39 @@ class _HomePageState extends State<HomePageOrangTua> {
 
   void logout() async {
     await authService.signOut();
+    if (!context.mounted) {
+      return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginPage(role: widget.role),
+      ),
+      (route) => false,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    _user = authService.currentUser;
+    if (_user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .get();
+      final data = doc.data();
+      if (data != null) {
+        setState(() {
+          namaUser = data['name'] ?? 'Pengguna';
+        });
+      }
+    }
   }
 
   @override
@@ -40,13 +78,16 @@ class _HomePageState extends State<HomePageOrangTua> {
         role: widget.role,
       ),
       drawer: CustomDrawer(
-        namaUser: "Bu Mira",
+        namaUser: namaUser,
         menuItems: [
           {
             'title': 'Profil',
             'onTap': () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => EditProfilePage()));
+                  MaterialPageRoute(
+                      builder: (context) => EditProfilePage(
+                            role: widget.role,
+                          )));
             }
           },
           {

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
+import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/ResetPassword/resetpassword_page.dart';
+import 'package:littlesteps/pages/role_page.dart';
 import 'package:littlesteps/pages/signup_page.dart';
 import 'package:littlesteps/utils/auth_service.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
 import 'package:littlesteps/widgets/customtextfield.dart';
-import 'package:littlesteps/utils/auth_gate.dart';
 
 class LoginPage extends StatefulWidget {
   final String role;
@@ -14,42 +16,72 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
-
 class _LoginPageState extends State<LoginPage> {
-  //get Auth Service
+  // get Auth Service
   final authService = AuthService();
 
-  //text Controllers
+  // text Controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  //check login
-  void login() async {
-    final email = emailController.text;
-    final password = passwordController.text;
 
-    try {
-      // await authService.signInWithEmail(email, password);
-      await authService.signInWithEmail(email: email, password: password);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("$e")));
+  // check login
+  Future<void> login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    final error = await authService.signInWithEmail(
+      email: email,
+      password: password,
+      selectedRole: widget.role,
+    );
+
+    if (!mounted) return;
+
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    } else {
+      if (widget.role == 'Guru') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomepageGuru(role: widget.role),
+          ),
+        );
+      } else if (widget.role == 'Orang Tua') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePageOrangTua(role: widget.role),
+          ),
+        );
       }
     }
   }
+
 
   void loginGoogle(String role) async {
     try {
       await authService.signInWithGoogle(role: role);
       if (mounted) {
-        // Ganti halaman jika berhasil login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AuthGate(role: widget.role),
-          ),
-        ); // atau halaman tujuanmu
+        if (widget.role == 'Guru') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomepageGuru(role: widget.role),
+            ),
+          );
+        } else if (widget.role == "Orang Tua") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomepageGuru(role: widget.role),
+            ),
+          );
+        }
+        
       }
     } catch (e) {
       if (mounted) {
@@ -67,7 +99,8 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => RolePage())),
             icon: Icon(
               Icons.arrow_back,
               size: 36,
@@ -88,7 +121,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text(
                         "Masuk",
                         style: TextStyle(
-                          // fontFamily: 'Inter',
                           fontSize: 32,
                           fontVariations: [FontVariation('wght', 800)],
                         ),
@@ -187,3 +219,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
