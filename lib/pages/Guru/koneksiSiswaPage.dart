@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'siswa.dart';
+import '../../model/anak.dart';
 
 class koneksiSiswaPage extends StatefulWidget {
   @override
@@ -15,15 +15,15 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
   Map<String, String> kodeKelas = {};
   Map<String, DateTime> codeGeneratedTimes = {};
 
-  List<Siswa> get currentSiswaList {
-    if (selectedKelas == 'Kelas A') {
-      return siswaKelasA;
-    } else if (selectedKelas == 'Kelas B') {
-      return siswaKelasB;
-    } else {
-      return [];
-    }
-  }
+  // List<Siswa> get currentSiswaList {
+  //   if (selectedKelas == 'Kelas A') {
+  //     return siswaKelasA;
+  //   } else if (selectedKelas == 'Kelas B') {
+  //     return siswaKelasB;
+  //   } else {
+  //     return [];
+  //   }
+  // }
 
   String generateRandomCode(int length) {
     const chara = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -34,7 +34,7 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
     ));
   }
 
-  void _showHubungkanDialog(Siswa siswa) {
+  void _showHubungkanDialog(Anak siswa) {
     DateTime now = DateTime.now();
     String? existingCode = kodeKelas[selectedKelas];
     DateTime? generatedAt = codeGeneratedTimes[selectedKelas];
@@ -143,229 +143,229 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
 
   @override
   Widget build(BuildContext context) {
-    final int jumlahTidakTerhubung =
-        currentSiswaList.where((siswa) => !siswa.isConnected).length;
-    final int jumlahTerhubung =
-        currentSiswaList.where((siswa) => siswa.isConnected).length;
+    // final int jumlahTidakTerhubung =
+    //     currentSiswaList.where((siswa) => !siswa.isConnected).length;
+    // final int jumlahTerhubung =
+    //     currentSiswaList.where((siswa) => siswa.isConnected).length;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Koneksi Siswa',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF53B1FD),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      side: BorderSide(color: Colors.black, width: 1),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        selectedKelas = 'Kelas A';
-                      });
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (_scrollController.hasClients) {
-                          _scrollController.animateTo(0,
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOut);
-                        }
-                      });
-                    },
-                    child: Text(
-                      'Kelas A',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFDE272),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      side: BorderSide(color: Colors.black, width: 1),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        selectedKelas = 'Kelas B';
-                      });
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (_scrollController.hasClients) {
-                          _scrollController.animateTo(0,
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOut);
-                        }
-                      });
-                    },
-                    child: Text(
-                      'Kelas B',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              selectedKelas ?? 'Pilih Kelas',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          if (selectedKelas != null)
-            Expanded(
-              child: ListView(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(8.0),
-                children: [
-                  Text(
-                    'TIDAK TERHUBUNG ($jumlahTidakTerhubung)',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  ...currentSiswaList
-                      .where((siswa) => !siswa.isConnected)
-                      .map((siswa) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 3),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      color: Colors.white,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            siswa.imagePath,
-                            width: 40,
-                            height: 40,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Tidak ada orang tua yang terhubung dengan ${siswa.name}',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    _showHubungkanDialog(siswa);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    side: BorderSide(
-                                        color: Colors.grey, width: 1),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 8),
-                                  ),
-                                  icon: Icon(Icons.add,
-                                      color: Colors.black, size: 18),
-                                  label: const Text(
-                                    'Hubungkan Orang Tua',
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 20),
-                  Text(
-                    'SUDAH TERHUBUNG ($jumlahTerhubung)',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  ...currentSiswaList
-                      .where((siswa) => siswa.isConnected)
-                      .map((siswa) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 3),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      color: Colors.white,
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            siswa.imagePath,
-                            width: 40,
-                            height: 40,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Orang Tua ${siswa.name}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${siswa.parentName}',
-                                  style: const TextStyle(color: Colors.black54),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  })
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
+        // appBar: AppBar(
+        //   backgroundColor: Colors.transparent,
+        //   elevation: 0,
+        //   title: Text(
+        //     'Koneksi Siswa',
+        //     style: TextStyle(fontWeight: FontWeight.bold),
+        //   ),
+        //   centerTitle: true,
+        //   leading: IconButton(
+        //     onPressed: () {
+        //       Navigator.pop(context);
+        //     },
+        //     icon: Icon(Icons.arrow_back),
+        //   ),
+        // ),
+        // body: Column(
+        //   children: [
+        //     Padding(
+        //       padding: const EdgeInsets.all(16),
+        //       child: Row(
+        //         children: [
+        //           Expanded(
+        //             child: ElevatedButton(
+        //               style: ElevatedButton.styleFrom(
+        //                 backgroundColor: Color(0xFF53B1FD),
+        //                 shape: RoundedRectangleBorder(
+        //                   borderRadius: BorderRadius.circular(18),
+        //                 ),
+        //                 side: BorderSide(color: Colors.black, width: 1),
+        //               ),
+        //               onPressed: () {
+        //                 setState(() {
+        //                   selectedKelas = 'Kelas A';
+        //                 });
+        //                 WidgetsBinding.instance.addPostFrameCallback((_) {
+        //                   if (_scrollController.hasClients) {
+        //                     _scrollController.animateTo(0,
+        //                         duration: Duration(milliseconds: 300),
+        //                         curve: Curves.easeInOut);
+        //                   }
+        //                 });
+        //               },
+        //               child: Text(
+        //                 'Kelas A',
+        //                 style: TextStyle(
+        //                   color: Colors.black,
+        //                   fontWeight: FontWeight.bold,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //           const SizedBox(width: 12),
+        //           Expanded(
+        //             child: ElevatedButton(
+        //               style: ElevatedButton.styleFrom(
+        //                 backgroundColor: Color(0xFFFDE272),
+        //                 shape: RoundedRectangleBorder(
+        //                   borderRadius: BorderRadius.circular(18),
+        //                 ),
+        //                 side: BorderSide(color: Colors.black, width: 1),
+        //               ),
+        //               onPressed: () {
+        //                 setState(() {
+        //                   selectedKelas = 'Kelas B';
+        //                 });
+        //                 WidgetsBinding.instance.addPostFrameCallback((_) {
+        //                   if (_scrollController.hasClients) {
+        //                     _scrollController.animateTo(0,
+        //                         duration: Duration(milliseconds: 300),
+        //                         curve: Curves.easeInOut);
+        //                   }
+        //                 });
+        //               },
+        //               child: Text(
+        //                 'Kelas B',
+        //                 style: TextStyle(
+        //                   color: Colors.black,
+        //                   fontWeight: FontWeight.bold,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //     const Divider(
+        //       color: Colors.black,
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.all(8.0),
+        //       child: Text(
+        //         selectedKelas ?? 'Pilih Kelas',
+        //         style: const TextStyle(
+        //           fontSize: 16,
+        //           fontWeight: FontWeight.bold,
+        //         ),
+        //       ),
+        //     ),
+        //     SizedBox(height: 10),
+        //     if (selectedKelas != null)
+        //       Expanded(
+        //         child: ListView(
+        //           controller: _scrollController,
+        //           padding: const EdgeInsets.all(8.0),
+        //           children: [
+        //             // Text(
+        //             //   'TIDAK TERHUBUNG ($jumlahTidakTerhubung)',
+        //             //   style: const TextStyle(
+        //             //       fontWeight: FontWeight.bold, fontSize: 16),
+        //             // ),
+        //             const SizedBox(height: 8),
+        //             ...currentSiswaList
+        //                 .where((siswa) => !siswa.isConnected)
+        //                 .map((siswa) {
+        //               return Container(
+        //                 margin: const EdgeInsets.symmetric(vertical: 3),
+        //                 padding: const EdgeInsets.symmetric(
+        //                     horizontal: 12, vertical: 8),
+        //                 color: Colors.white,
+        //                 child: Row(
+        //                   crossAxisAlignment: CrossAxisAlignment.start,
+        //                   children: [
+        //                     Image.asset(
+        //                       siswa.imagePath,
+        //                       width: 40,
+        //                       height: 40,
+        //                     ),
+        //                     const SizedBox(width: 10),
+        //                     Expanded(
+        //                       child: Column(
+        //                         crossAxisAlignment: CrossAxisAlignment.start,
+        //                         children: [
+        //                           Text(
+        //                             'Tidak ada orang tua yang terhubung dengan ${siswa.name}',
+        //                             style: const TextStyle(
+        //                               color: Colors.black,
+        //                               fontSize: 16,
+        //                             ),
+        //                           ),
+        //                           const SizedBox(height: 8),
+        //                           ElevatedButton.icon(
+        //                             onPressed: () {
+        //                               _showHubungkanDialog(siswa);
+        //                             },
+        //                             style: ElevatedButton.styleFrom(
+        //                               backgroundColor: Colors.white,
+        //                               shape: RoundedRectangleBorder(
+        //                                 borderRadius: BorderRadius.circular(8),
+        //                               ),
+        //                               side: BorderSide(
+        //                                   color: Colors.grey, width: 1),
+        //                               padding: const EdgeInsets.symmetric(
+        //                                   horizontal: 12, vertical: 8),
+        //                             ),
+        //                             icon: Icon(Icons.add,
+        //                                 color: Colors.black, size: 18),
+        //                             label: const Text(
+        //                               'Hubungkan Orang Tua',
+        //                               style: TextStyle(color: Colors.black),
+        //                             ),
+        //                           ),
+        //                         ],
+        //                       ),
+        //                     )
+        //                   ],
+        //                 ),
+        //               );
+        //             }),
+        //             const SizedBox(height: 20),
+        //             Text(
+        //               'SUDAH TERHUBUNG ($jumlahTerhubung)',
+        //               style: const TextStyle(
+        //                   fontWeight: FontWeight.bold, fontSize: 16),
+        //             ),
+        //             const SizedBox(height: 8),
+        //             ...currentSiswaList
+        //                 .where((siswa) => siswa.isConnected)
+        //                 .map((siswa) {
+        //               return Container(
+        //                 margin: const EdgeInsets.symmetric(vertical: 3),
+        //                 padding: const EdgeInsets.symmetric(
+        //                     horizontal: 12, vertical: 8),
+        //                 color: Colors.white,
+        //                 child: Row(
+        //                   children: [
+        //                     Image.asset(
+        //                       siswa.imagePath,
+        //                       width: 40,
+        //                       height: 40,
+        //                     ),
+        //                     const SizedBox(width: 10),
+        //                     Expanded(
+        //                       child: Column(
+        //                         crossAxisAlignment: CrossAxisAlignment.start,
+        //                         children: [
+        //                           Text(
+        //                             'Orang Tua ${siswa.name}',
+        //                             style: const TextStyle(
+        //                                 fontWeight: FontWeight.bold),
+        //                           ),
+        //                           const SizedBox(height: 4),
+        //                           Text(
+        //                             '${siswa.parentName}',
+        //                             style: const TextStyle(color: Colors.black54),
+        //                           ),
+        //                         ],
+        //                       ),
+        //                     ),
+        //                   ],
+        //                 ),
+        //               );
+        //             })
+        //           ],
+        //         ),
+        //       ),
+        //   ],
+        // ),
+        );
   }
 }

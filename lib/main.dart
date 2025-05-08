@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:littlesteps/pages/splash_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  // await Supabase.initialize(
-  //   url: 'https://rsftbavuwvfqmdedqsdb.supabase.co',
-  //   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzZnRiYXZ1d3ZmcW1kZWRxc2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxMzQyMDIsImV4cCI6MjA2MDcxMDIwMn0.YSmRF4VmQ_b4k8gBBL7CCOWKFZNPyGfGIVgom0ReZ28',
-  // );
+  await Supabase.initialize(
+    url: 'https://rsftbavuwvfqmdedqsdb.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzZnRiYXZ1d3ZmcW1kZWRxc2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxMzQyMDIsImV4cCI6MjA2MDcxMDIwMn0.YSmRF4VmQ_b4k8gBBL7CCOWKFZNPyGfGIVgom0ReZ28',
+  );
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -16,7 +17,7 @@ Future<void> main() async {
   );
   runApp(MyApp());
 }
-        
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
             fontFamily: 'Inter',
             scaffoldBackgroundColor: Color(0xffF3FAFB),
@@ -35,3 +36,4 @@ class MyApp extends StatelessWidget {
 }
 
         // body: Center(child: RolePage(),),
+

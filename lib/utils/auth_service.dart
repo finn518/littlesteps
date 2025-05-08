@@ -6,7 +6,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthService {
   final firebaseAuth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
-
   User? get currentUser => firebaseAuth.currentUser;
 
   // login Email and Password
@@ -139,7 +138,6 @@ class AuthService {
   Future<void> resetPassword({required String email}) async {
     await firebaseAuth.sendPasswordResetEmail(email: email);
   }
-
 
   Future<String?> updateUserEmail(String newEmail) async {
     try {
