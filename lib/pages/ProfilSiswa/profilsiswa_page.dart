@@ -3,14 +3,14 @@ import 'dart:io';
 import "package:flutter/material.dart";
 import "package:littlesteps/pages/Guru/laporanPerkembanganGuruPage.dart";
 import "package:littlesteps/pages/Guru/rangkumanKehadiran.dart";
-import "package:littlesteps/pages/Guru/siswa.dart";
+import "package:littlesteps/model/anak.dart";
 import "package:littlesteps/pages/ProfilSiswa/catatankesehatan_page.dart";
 import "package:littlesteps/pages/ProfilSiswa/rangkumanpenilaian_page.dart";
 import "package:littlesteps/utils/device_dimension.dart";
 import 'package:littlesteps/widgets/appBackground.dart';
 
 class ProfilSiswaPage extends StatelessWidget {
-  final Siswa siswa;
+  final Anak siswa;
   final String role;
   const ProfilSiswaPage({super.key, required this.siswa, required this.role});
 
@@ -38,18 +38,18 @@ class ProfilSiswaPage extends StatelessWidget {
                 SizedBox(height: 20),
                 CircleAvatar(
                   radius: 70,
-                  backgroundImage: siswa.imagePath.startsWith('assets')
-                      ? AssetImage(siswa.imagePath) as ImageProvider
-                      : FileImage(File(siswa.imagePath)),
+                  // backgroundImage: siswa.imagePath.startsWith('assets')
+                  //     ? AssetImage(siswa.imagePath) as ImageProvider
+                  //     : FileImage(File(siswa.imagePath)),
                 ),
                 SizedBox(height: 25),
-                Text(
-                  siswa.name,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontVariations: [FontVariation('wght', 800)],
-                  ),
-                ),
+                // Text(
+                //   siswa.name,
+                //   style: TextStyle(
+                //     fontSize: 32,
+                //     fontVariations: [FontVariation('wght', 800)],
+                //   ),
+                // ),
                 SizedBox(height: 30),
                 buildMenuButton("Catatan Kesehatan", Color(0xffB2DDFF), () {
                   Navigator.push(
@@ -93,7 +93,6 @@ class ProfilSiswaPage extends StatelessWidget {
   }
 
   Widget buildMenuButton(String label, Color? color, VoidCallback callback) {
-
     return GestureDetector(
       onTap: callback,
       child: Container(

@@ -1,14 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_database/firebase_database.dart'; // Tambahkan ini
+import 'package:firebase_database/firebase_database.dart';
 
 class AuthService {
   final firebaseAuth = FirebaseAuth.instance;
   final database = FirebaseDatabase.instanceFor(
-    app: Firebase.app(),
-    databaseURL: "https://littlesteps-52095-default-rtdb.asia-southeast1.firebasedatabase.app/"
-  ).ref();
+          app: Firebase.app(),
+          databaseURL:
+              "https://littlesteps-52095-default-rtdb.asia-southeast1.firebasedatabase.app/")
+      .ref();
   User? get currentUser => firebaseAuth.currentUser;
   Stream<User?> get authStateChange => firebaseAuth.authStateChanges();
 
@@ -18,9 +19,10 @@ class AuthService {
     try {
       UserCredential userCredential = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
-      
+
       // Get data from Realtime Database
-      final snapshot = await database.child('users/${userCredential.user!.uid}').get();
+      final snapshot =
+          await database.child('users/${userCredential.user!.uid}').get();
       if (snapshot.exists) {
         return snapshot.child('role').value.toString();
       } else {
@@ -32,17 +34,16 @@ class AuthService {
   }
 
   // Sign Up Email and Password
-  Future<String?> signUpWithEmail({
-    required String email, 
-    required String password, 
-    required String name, 
-    required String nomer, 
-    required String role
-  }) async {
+  Future<String?> signUpWithEmail(
+      {required String email,
+      required String password,
+      required String name,
+      required String nomer,
+      required String role}) async {
     try {
       UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-      
+
       await database.child('users/${userCredential.user!.uid}').set({
         'email': email,
         'name': name,
@@ -82,7 +83,7 @@ class AuthService {
       if (user != null) {
         final userRef = database.child('users/${user.uid}');
         final snapshot = await userRef.get();
-        
+
         if (!snapshot.exists) {
           await userRef.set({
             'email': user.email ?? '',

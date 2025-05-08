@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart';
 
-import 'siswa.dart';
+import '../../model/anak.dart';
 
 class KelasPage extends StatefulWidget {
   final String namaKelas;
-  final List<Siswa> listSiswa;
+  final List<Anak> listSiswa;
   final String role;
 
   const KelasPage(
@@ -22,7 +22,7 @@ class KelasPage extends StatefulWidget {
 }
 
 class _KelasPageState extends State<KelasPage> {
-  late List<Siswa> siswaList;
+  late List<Anak> siswaList;
   File? selectedImage;
 
   @override
@@ -92,7 +92,7 @@ class _KelasPageState extends State<KelasPage> {
     );
   }
 
-  Widget buildSiswaItem(Siswa siswa) {
+  Widget buildSiswaItem(Anak siswa) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -120,30 +120,30 @@ class _KelasPageState extends State<KelasPage> {
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: siswa.imagePath.startsWith('assets')
-                      ? AssetImage(siswa.imagePath) as ImageProvider
-                      : FileImage(File(siswa.imagePath)),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              siswa.name,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontVariations: [FontVariation('wght', 700)],
-                fontSize: 14,
-              ),
-            ),
-          ],
+          // children: [
+          //   Container(
+          //     width: 50,
+          //     height: 50,
+          //     decoration: BoxDecoration(
+          //       shape: BoxShape.circle,
+          //       image: DecorationImage(
+          //         image: siswa.imagePath.startsWith('assets')
+          //             ? AssetImage(siswa.imagePath) as ImageProvider
+          //             : FileImage(File(siswa.imagePath)),
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //   ),
+          //   const SizedBox(height: 8),
+          //   Text(
+          //     siswa.name,
+          //     textAlign: TextAlign.center,
+          //     style: const TextStyle(
+          //       fontVariations: [FontVariation('wght', 700)],
+          //       fontSize: 14,
+          //     ),
+          //   ),
+          // ],
         ),
       ),
     );
@@ -174,8 +174,7 @@ class _KelasPageState extends State<KelasPage> {
                   children: [
                     const Text(
                       'Buat Profil Siswa',
-                      style:
-                          TextStyle(
+                      style: TextStyle(
                           fontVariations: [FontVariation('wght', 800)],
                           fontSize: 18),
                     ),
@@ -212,12 +211,12 @@ class _KelasPageState extends State<KelasPage> {
                         onPressed: () {
                           if (namaBaru.isNotEmpty) {
                             setState(() {
-                              siswaList.add(Siswa(
-                                name: namaBaru,
-                                imagePath: selectedImage?.path ??
-                                    'assets/kid_face.png',
-                              ));
-                              selectedImage = null;
+                              // siswaList.add(Siswa(
+                              //   name: namaBaru,
+                              //   imagePath: selectedImage?.path ??
+                              //       'assets/kid_face.png',
+                              // ));
+                              // selectedImage = null;
                             });
                             Navigator.pop(context);
                           }

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:littlesteps/pages/Guru/siswa.dart';
+import 'package:littlesteps/model/anak.dart';
 
 class KehadiranPage extends StatefulWidget {
   @override
@@ -11,7 +11,7 @@ class KehadiranPage extends StatefulWidget {
 
 class _KehadiranPageState extends State<KehadiranPage> {
   String? selectedKelas;
-  List<Siswa> siswaList = [];
+  List<Anak> siswaList = [];
   Map<String, String> absensi = {};
 
   @override
@@ -46,8 +46,8 @@ class _KehadiranPageState extends State<KehadiranPage> {
                       ),
                       onPressed: () {
                         setState(() {
-                          selectedKelas = 'A';
-                          siswaList = siswaKelasA;
+                          // selectedKelas = 'A';
+                          // siswaList = siswaKelasA;
                         });
                       },
                       child: const Text(
@@ -71,8 +71,8 @@ class _KehadiranPageState extends State<KehadiranPage> {
                       ),
                       onPressed: () {
                         setState(() {
-                          selectedKelas = 'B';
-                          siswaList = siswaKelasB;
+                          // selectedKelas = 'B';
+                          // siswaList = siswaKelasB;
                         });
                       },
                       child: const Text(
@@ -118,27 +118,27 @@ class _KehadiranPageState extends State<KehadiranPage> {
                                   height: 40,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                      image: (siswa.imagePath.isEmpty)
-                                          ? AssetImage('assets/kid_face.png')
-                                          : (siswa.imagePath
-                                                      .startsWith('assets')
-                                                  ? AssetImage(siswa.imagePath)
-                                                  : FileImage(
-                                                      File(siswa.imagePath)))
-                                              as ImageProvider,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    // image: DecorationImage(
+                                    //   image: (siswa.imagePath.isEmpty)
+                                    //       ? AssetImage('assets/kid_face.png')
+                                    //       : (siswa.imagePath
+                                    //                   .startsWith('assets')
+                                    //               ? AssetImage(siswa.imagePath)
+                                    //               : FileImage(
+                                    //                   File(siswa.imagePath)))
+                                    //           as ImageProvider,
+                                    //   fit: BoxFit.cover,
+                                    // ),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    siswa.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
+                                // Expanded(
+                                //   child: Text(
+                                //     siswa.name,
+                                //     style: const TextStyle(
+                                //         fontWeight: FontWeight.bold),
+                                //   ),
+                                // ),
                                 SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.42,
@@ -163,7 +163,7 @@ class _KehadiranPageState extends State<KehadiranPage> {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        value: absensi[siswa.name],
+                                        //value: absensi[siswa.name],
                                         icon: const Icon(Icons.arrow_drop_down),
                                         borderRadius: BorderRadius.circular(12),
                                         items: [
@@ -179,7 +179,7 @@ class _KehadiranPageState extends State<KehadiranPage> {
                                             .toList(),
                                         onChanged: (value) {
                                           setState(() {
-                                            absensi[siswa.name] = value!;
+                                            //  absensi[siswa.name] = value!;
                                           });
                                         },
                                       ),
