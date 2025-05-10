@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/Guru/KelasPage.dart';
 import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/utils/auth_service.dart';
@@ -25,7 +26,7 @@ class _SignupPageState extends State<SignupPage> {
   final nomorteleponController = TextEditingController();
 
   //check login
-  void signUp() async{
+  void signUp() async {
     //prepare data
     final email = emailController.text;
     final password = passwordController.text;
@@ -68,7 +69,6 @@ class _SignupPageState extends State<SignupPage> {
         ),
       );
     }
-     
   }
 
   void loginGoogle(String role) async {
@@ -79,7 +79,7 @@ class _SignupPageState extends State<SignupPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomepageGuru(role: widget.role),
+              builder: (context) => KelasPage(role: widget.role),
             ),
           );
         } else if (widget.role == "Orang Tua") {
@@ -134,7 +134,7 @@ class _SignupPageState extends State<SignupPage> {
                             fontSize: 28, fontWeight: FontWeight.w800),
                       ),
                     ),
-                   Center(
+                    Center(
                         child: CustomTextField(
                             label: "Nama", controller: namaController)),
                     SizedBox(
@@ -159,11 +159,7 @@ class _SignupPageState extends State<SignupPage> {
                             label: "Kata Sandi",
                             isPassword: true,
                             controller: passwordController)),
-
-                    CustomButton(
-                        label: "Buat Akun",
-                        onPressed: signUp),
-
+                    CustomButton(label: "Buat Akun", onPressed: signUp),
                     Center(
                       child: Text(
                         "Atau lanjutkan dengan Google",
@@ -200,8 +196,9 @@ class _SignupPageState extends State<SignupPage> {
                     CustomButton(
                       label: "Masuk",
                       onPressed: () {
-                      Navigator.pop(context);
-                    },),
+                        Navigator.pop(context);
+                      },
+                    ),
                   ],
                 ),
               ),

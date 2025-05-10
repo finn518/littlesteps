@@ -14,7 +14,8 @@ import "package:littlesteps/widgets/customdrawer.dart";
 
 class HomepageGuru extends StatefulWidget {
   final String role;
-  const HomepageGuru({super.key, required this.role});
+  final String kelasId;
+  const HomepageGuru({super.key, required this.role, required this.kelasId});
 
   @override
   State<HomepageGuru> createState() => _HomepageGuruState();
@@ -31,7 +32,7 @@ class _HomepageGuruState extends State<HomepageGuru> {
   void initState() {
     super.initState();
     pages = [
-      BerandaGuru(role: widget.role),
+      BerandaGuru(kelasId: widget.kelasId, role: widget.role),
       GaleriGuruPage(),
       PesanPage(),
     ];

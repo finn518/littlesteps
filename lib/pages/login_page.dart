@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/Guru/KelasPage.dart';
 import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/ResetPassword/resetpassword_page.dart';
@@ -16,6 +17,7 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
+
 class _LoginPageState extends State<LoginPage> {
   // get Auth Service
   final authService = AuthService();
@@ -23,7 +25,6 @@ class _LoginPageState extends State<LoginPage> {
   // text Controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
 
   // check login
   Future<void> login() async {
@@ -47,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomepageGuru(role: widget.role),
+            builder: (context) => KelasPage(role: widget.role),
           ),
         );
       } else if (widget.role == 'Orang Tua') {
@@ -61,7 +62,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-
   void loginGoogle(String role) async {
     try {
       await authService.signInWithGoogle(role: role);
@@ -70,18 +70,17 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomepageGuru(role: widget.role),
+              builder: (context) => KelasPage(role: widget.role),
             ),
           );
         } else if (widget.role == "Orang Tua") {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomepageGuru(role: widget.role),
+              builder: (context) => KelasPage(role: widget.role),
             ),
           );
         }
-        
       }
     } catch (e) {
       if (mounted) {
@@ -219,4 +218,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

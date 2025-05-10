@@ -1,20 +1,20 @@
 class Kelas {
   final String id;
   final String nama;
-  final String tahunAjaran;
+  final String tahunAngkatan;
   final String gambarKelas;
 
   Kelas(
       {required this.id,
       required this.nama,
-      required this.tahunAjaran,
+      required this.tahunAngkatan,
       required this.gambarKelas});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nama': nama,
-      'tahunAjaran': tahunAjaran,
+      'tahunAngkatan': tahunAngkatan,
       'gambarKelas': gambarKelas,
     };
   }
@@ -23,10 +23,16 @@ class Kelas {
     return Kelas(
         id: map['id'],
         nama: map['nama'],
-        tahunAjaran: map['tahunAjaran'],
-        gambarKelas: map['gambarKelas']);
+        tahunAngkatan: map['tahunAngkatan'],
+        gambarKelas: map['gambarKelas'] is List
+            ? (map['gambarKelas'] as List).first
+            : map['gambarKelas']);
   }
 
-  String get fullImageUrl =>
-      'https://rsftbavuwvfqmdedqsdb.supabase.co/storage/v1/object/public/kelas/$gambarKelas';
+  String get fullImageUrl {
+    if (gambarKelas.startsWith("http")) {
+      return gambarKelas;
+    }
+    return "https://rsftbavuwvfqmdedqsdb.supabase.co/storage/v1/object/public/kelas/images/$gambarKelas";
+  }
 }
