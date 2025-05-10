@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:littlesteps/model/kelas.dart';
+import 'package:littlesteps/pages/Guru/KelasPage.dart';
 import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/login_page.dart';
@@ -12,7 +14,6 @@ import 'package:littlesteps/widgets/customtextfield.dart';
 class EditProfilePage extends StatefulWidget {
   final String role;
   const EditProfilePage({super.key, required this.role});
-
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -26,7 +27,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final namaController = TextEditingController();
   final nomerController = TextEditingController();
 
-@override
+  @override
   void initState() {
     super.initState();
     _loadUserData();
@@ -111,7 +112,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-                builder: (context) => HomepageGuru(role: widget.role)),
+                builder: (context) => KelasPage(role: widget.role)),
             (route) => false,
           );
         } else if (widget.role == "Orang Tua") {
@@ -130,21 +131,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
     final height = DeviceDimensions.height(context);
     return Scaffold(
-     appBar: AppBar(
+      appBar: AppBar(
         leading: IconButton(
             onPressed: () {
               if (widget.role == "Guru") {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HomepageGuru(role: widget.role)),
+                      builder: (context) => KelasPage(role: widget.role)),
                   (route) => false,
                 );
               } else if (widget.role == "Orang Tua") {
@@ -167,19 +166,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
             fontVariations: [FontVariation('wght', 800)],
           ),
         ),
-            centerTitle: true,
-            backgroundColor: Color(0xffB2DDFF),
+        centerTitle: true,
+        backgroundColor: Color(0xffB2DDFF),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-           editprofil(width),
-           Container(
+            editprofil(width),
+            Container(
               margin: EdgeInsets.symmetric(
                   horizontal: width * 0.14, vertical: height * 0.01),
-             child: Column(
-              children: [
-                CustomTextField(label: "Nama", controller: namaController),
+              child: Column(
+                children: [
+                  CustomTextField(label: "Nama", controller: namaController),
                   SizedBox(
                     height: 20,
                   ),
@@ -209,10 +208,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     label: "Edit Profil",
                     onPressed: saveChanges,
                   )
-              ],
-             ),
-           ),
-          
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -223,34 +221,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Column(
       children: [
         SizedBox(
-                height: 200,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned(
-                      top: -20,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/bgprofil.png"))),
+          height: 200,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                top: -20,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/bgprofil.png"))),
+                ),
+              ),
+              Positioned(
+                  left: width * 0.32,
+                  bottom: -40,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 70,
+                        backgroundColor: Color(0xff0066FF),
+                        child: CircleAvatar(
+                          radius: 65, //nanti dikecilin
+                          backgroundImage:
+                              AssetImage("assets/images/Bu_mira.png"),
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      left: width * 0.32,
-                      bottom: -40, 
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 70,
-                            backgroundColor: Color(0xff0066FF),
-                            child: CircleAvatar(
-                              radius: 65, //nanti dikecilin
-                              backgroundImage: AssetImage("assets/images/Bu_mira.png"),
-                            ),
-                          ),
-                          CircleAvatar(
+                      CircleAvatar(
                         radius: 25,
                         backgroundColor: Colors.transparent, // Biar transparan
                         child: Stack(
@@ -278,14 +279,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ],
                         ),
                       )
-
-                        ],
-                      )
-                    )
-                  ],
-                ),
-               ),
-               SizedBox(height: 80,)
+                    ],
+                  ))
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 80,
+        )
       ],
     );
   }

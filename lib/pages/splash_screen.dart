@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/Guru/KelasPage.dart';
 import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/role_page.dart';
@@ -37,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
         if (role == 'Guru') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => HomepageGuru(role: role)),
+            MaterialPageRoute(builder: (_) => KelasPage(role: role)),
           );
           return;
         } else if (role == 'Orang Tua') {
@@ -82,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         child: Center(
-         child: Image.asset(
+          child: Image.asset(
             'assets/images/LOGO_FINAL.png',
             width: 325, // default size sesuai Native Splash
             height: 325,
