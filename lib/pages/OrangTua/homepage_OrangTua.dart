@@ -1,9 +1,11 @@
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:littlesteps/model/anak.dart";
 import "package:littlesteps/pages/OrangTua/beranda.dart";
 import "package:littlesteps/pages/OrangTua/galeri_page.dart";
 import "package:littlesteps/pages/OrangTua/keyanak_page.dart";
+import "package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";
 import "package:littlesteps/pages/login_page.dart";
@@ -16,7 +18,7 @@ import "package:littlesteps/widgets/customdrawer.dart";
 class HomePageOrangTua extends StatefulWidget {
   final String role;
   const HomePageOrangTua({super.key, required this.role});
-  
+
   @override
   State<HomePageOrangTua> createState() => _HomePageState();
 }
@@ -25,6 +27,7 @@ class _HomePageState extends State<HomePageOrangTua> {
   final authService = AuthService();
   User? _user;
   String namaUser = "pengguna";
+  Anak? anak;
   List<Widget> pages = [Beranda(), GaleriPage(), PesanPage()];
   int _selectedIndex = 0;
 
@@ -36,15 +39,11 @@ class _HomePageState extends State<HomePageOrangTua> {
 
   void logout() async {
     await authService.signOut();
-    if (!context.mounted) {
-      return;
-    }
+    if (!context.mounted) return;
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (context) => LoginPage(role: widget.role),
-      ),
+      MaterialPageRoute(builder: (context) => LoginPage(role: widget.role)),
       (route) => false,
     );
   }
@@ -53,6 +52,7 @@ class _HomePageState extends State<HomePageOrangTua> {
   void initState() {
     super.initState();
     _loadUserData();
+    _checkConnected(); // Memastikan data anak dimuat
   }
 
   void _loadUserData() async {
@@ -64,48 +64,125 @@ class _HomePageState extends State<HomePageOrangTua> {
           .get();
       final data = doc.data();
       if (data != null) {
+        final String sapaan = data['sapaan'] ?? '';
+        final String name = data['name'] ?? '';
         setState(() {
-          namaUser = data['name'] ?? 'Pengguna';
+          namaUser = sapaan.isNotEmpty
+              ? '$sapaan $name'
+              : (name.isNotEmpty ? name : 'Pengguna');
         });
       }
     }
   }
 
+  Future<void> _checkConnected() async {
+    final firestore = FirebaseFirestore.instance;
+    _user = authService.currentUser;
+    if (_user == null) return;
+
+    try {
+      final doc = await firestore.collection('users').doc(_user!.uid).get();
+      final data = doc.data();
+      if (data == null) return;
+
+      final bool connected = data['isConnected'] ?? false;
+      final String anakId = data['anakId'] ?? '';
+      final String kelasId = data['kelasId'] ?? '';
+
+      if (connected && anakId.isNotEmpty && kelasId.isNotEmpty) {
+        final anakRef = firestore
+            .collection('kelas')
+            .doc(kelasId)
+            .collection('anak')
+            .doc(anakId);
+        final anakDoc = await anakRef.get();
+
+        if (anakDoc.exists) {
+          final anakData = anakDoc.data();
+          if (anakData != null) {
+            setState(() {
+              anak = Anak.fromMap(anakData);
+            });
+          }
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Data anak tidak ditemukan.")),
+          );
+
+          // Reset connection status jika data tidak ditemukan
+          await _resetUserConnection();
+        }
+      }
+    } catch (e) {
+      print("Error checking connection: $e");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal memeriksa koneksi anak.")),
+      );
+    }
+  }
+
+  Future<void> _resetUserConnection() async {
+    final firestore = FirebaseFirestore.instance;
+    if (_user == null) return;
+
+    await firestore.collection('users').doc(_user!.uid).update({
+      'isConnected': false,
+      'anakId': FieldValue.delete(),
+      'namaAnak': FieldValue.delete(),
+      'kelasId': FieldValue.delete(),
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(
-        role: widget.role,
-      ),
+      appBar: CustomAppbar(role: widget.role),
       drawer: CustomDrawer(
         namaUser: namaUser,
         menuItems: [
           {
             'title': 'Profil',
             'onTap': () {
-              Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (context) => EditProfilePage(
-                            role: widget.role,
-                          )));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfilePage(role: widget.role),
+                ),
+              );
             }
           },
           {
             'title': 'Informasi Anak',
             'onTap': () {
-              Navigator.push(
+              if (anak != null) {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => KeyAnakPage(
-                            role: widget.role,
-                          )));
+                    builder: (context) => ProfilSiswaPage(
+                      siswa: anak!,
+                      role: widget.role,
+                    ),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => KeyAnakPage(role: widget.role),
+                  ),
+                );
+              }
             }
           },
           {
             'title': 'Bantuan',
             'onTap': () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => BantuanPage()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BantuanPage()),
+              );
             }
           },
           {
@@ -138,7 +215,7 @@ class _HomePageState extends State<HomePageOrangTua> {
                 "Apakah Anda yakin\ningin keluar akun?",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 22,
                   fontVariations: [FontVariation('wght', 800)],
                 ),
               ),
@@ -156,42 +233,65 @@ class _HomePageState extends State<HomePageOrangTua> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Tombol Ya
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Color(0xff0066FF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 40),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    onPressed: () {
-                      Navigator.pop(context); // tutup dialog
-                      // Aksi logout
-                      logout();
-                    },
-                    child: Text("Ya",
-                        style: TextStyle(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Color(0xff0066FF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        logout();
+                      },
+                      child: Text("Ya",
+                          style: TextStyle(
                             fontVariations: [FontVariation('wght', 800)],
                             color: Colors.white,
-                            fontSize: 18)),
+                            fontSize: 18,
+                          )),
+                    ),
                   ),
                   SizedBox(width: 16),
-                  // Tombol Tidak
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 30),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    onPressed: () => Navigator.pop(context),
-                    child: Text("Tidak",
-                        style: TextStyle(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(color: Colors.black),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("Tidak",
+                          style: TextStyle(
                             fontVariations: [FontVariation('wght', 800)],
                             color: Color(0xff0066FF),
-                            fontSize: 18)),
+                            fontSize: 18,
+                          )),
+                    ),
                   ),
                 ],
               ),
@@ -201,4 +301,6 @@ class _HomePageState extends State<HomePageOrangTua> {
       },
     );
   }
+
+
 }

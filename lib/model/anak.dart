@@ -4,20 +4,36 @@ class Anak {
   final String namaPanggilan;
   final String fotoPath;
   final String idKelas;
-  String? parentName;
-  bool isConnected;
+  final String? specialCode;
+  final DateTime? codeGeneratedAt;
+  final String? parentName;
+  final bool isConnected;
 
-  Anak(
-      {required this.id,
-      required this.nama,
-      required this.namaPanggilan,
-      required this.fotoPath,
-      required this.idKelas,
-      this.parentName,
-      this.isConnected = false});
+  Anak({
+    required this.id,
+    required this.nama,
+    required this.namaPanggilan,
+    required this.fotoPath,
+    required this.idKelas,
+    this.specialCode,
+    this.codeGeneratedAt,
+    this.parentName,
+    this.isConnected = false,
+  });
 
-  String get fullImageUrl =>
-      'https://rsftbavuwvfqmdedqsdb.supabase.co/storage/v1/object/public/anak/$fotoPath';
+  factory Anak.fromMap(Map<String, dynamic> map) {
+    return Anak(
+      id: map['id'] ?? '',
+      nama: map['nama'] ?? '',
+      namaPanggilan: map['namaPanggilan'] ?? '',
+      fotoPath: map['fotoPath'] ?? '',
+      idKelas: map['idKelas'] ?? '',
+      specialCode: map['specialCode'],
+      codeGeneratedAt: map['codeGeneratedAt']?.toDate(),
+      parentName: map['parentName'],
+      isConnected: map['isConnected'] ?? false,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -26,19 +42,10 @@ class Anak {
       'namaPanggilan': namaPanggilan,
       'fotoPath': fotoPath,
       'idKelas': idKelas,
+      'specialCode': specialCode,
+      'codeGeneratedAt': codeGeneratedAt,
       'parentName': parentName,
       'isConnected': isConnected,
     };
-  }
-
-  factory Anak.fromMap(Map<dynamic, dynamic> map) {
-    return Anak(
-        id: map['id'],
-        nama: map['nama'],
-        namaPanggilan: map['namaPanggilan'],
-        fotoPath: map['fotoPath'],
-        idKelas: map['idKelas'],
-        parentName: map['parentName'],
-        isConnected: map['isConnected'] ?? false);
   }
 }

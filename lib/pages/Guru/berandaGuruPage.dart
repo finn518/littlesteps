@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:math';
 import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -90,6 +90,8 @@ class _BerandaGuruState extends State<BerandaGuru> {
           ),
         );
       },
+      onLongPress: () =>
+          showDeleteDialog(context, siswa.namaPanggilan, siswa.id),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -133,6 +135,156 @@ class _BerandaGuruState extends State<BerandaGuru> {
       ),
     );
   }
+
+  void showDeleteDialog(BuildContext context, nama, id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          contentPadding: EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Apakah Anda yakin\ningin menghapus $nama?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontVariations: [FontVariation('wght', 800)],
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Semua perubahan yang belum\ndisimpan mungkin akan hilang",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontVariations: [FontVariation('wght', 500)],
+                  color: Colors.grey[600],
+                  fontSize: 18,
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Tombol Ya dengan shadow
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Color(0xff0066FF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _deleteSiswa(id);
+                      },
+                      child: Text(
+                        "Ya",
+                        style: TextStyle(
+                          fontVariations: [FontVariation('wght', 800)],
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  // Tombol Tidak tanpa shadow
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(color: Colors.black),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        "Tidak",
+                        style: TextStyle(
+                          fontVariations: [FontVariation('wght', 800)],
+                          color: Color(0xff0066FF),
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteSiswa(String siswaId) async {
+    try {
+      // Pastikan kita menghapus dari koleksi yang benar
+      final docRef = FirebaseFirestore.instance
+          .collection('kelas')
+          .doc(widget.kelasId)
+          .collection('anak')
+          .doc(siswaId);
+
+      // Verifikasi dokumen ada sebelum menghapus
+      final doc = await docRef.get();
+      if (!doc.exists) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Data siswa tidak ditemukan, ${siswaId}")),
+        );
+        return;
+      }
+
+      await docRef.delete();
+
+      // Hapus dari daftar lokal
+      if (mounted) {
+        setState(() {
+          daftarSiswa.removeWhere((siswa) => siswa.id == siswaId);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Siswa berhasil dihapus")),
+        );
+      }
+    } catch (e) {
+      print("Error saat menghapus siswa: $e");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal menghapus siswa: ${e.toString()}")),
+      );
+    }
+  }
+
 
   void showTambahSiswaForm(BuildContext context) {
     String namaBaru = '';
@@ -205,8 +357,6 @@ class _BerandaGuruState extends State<BerandaGuru> {
                         onPressed: () async {
                           if (namaBaru.isNotEmpty && panggilan.isNotEmpty) {
                             try {
-                              final idSiswa =
-                                  '${namaBaru.toLowerCase().replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}';
                               List<String> uploadedUrls =
                                   await _uploadAllImages();
                               String imageUrl = uploadedUrls.isNotEmpty
@@ -215,14 +365,18 @@ class _BerandaGuruState extends State<BerandaGuru> {
                               final siswaCollection = FirebaseFirestore.instance
                                   .collection('kelas')
                                   .doc(widget.kelasId)
-                                  .collection('anak');
+                                  .collection('anak')
+                                  .doc();
 
-                              await siswaCollection.doc(idSiswa).set({
-                                'id': idSiswa,
+                              await siswaCollection.set({
+                                'id': siswaCollection.id,
                                 'nama': namaBaru,
                                 'namaPanggilan': panggilan,
                                 'fotoPath': imageUrl,
                                 'idKelas': widget.kelasId,
+                                'specialCode': null,
+                                'parentName': null,
+                                'isConnected': false,
                               });
 
                               setState(() {
@@ -297,7 +451,7 @@ class _BerandaGuruState extends State<BerandaGuru> {
                           "assets/icons/guru_koneksi_siswa.png",
                           'Koneksi Siswa',
                           Color(0xFFFF9C66),
-                          koneksiSiswaPage())),
+                          KoneksiSiswaPage(kelasId: widget.kelasId))),
                 ],
               ),
               const SizedBox(height: 20),

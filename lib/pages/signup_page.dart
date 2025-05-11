@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:littlesteps/pages/Guru/KelasPage.dart';
-import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
-import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/utils/auth_service.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
@@ -24,14 +21,16 @@ class _SignupPageState extends State<SignupPage> {
   final passwordController = TextEditingController();
   final namaController = TextEditingController();
   final nomorteleponController = TextEditingController();
+  final sapaanController = TextEditingController();
 
   //check login
   void signUp() async {
     //prepare data
-    final email = emailController.text;
-    final password = passwordController.text;
-    final nama = namaController.text;
-    final nomor = nomorteleponController.text;
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final nama = namaController.text.trim();
+    final nomor = nomorteleponController.text.trim();
+    final sapaan = sapaanController.text.trim();
 
     if (nama.isEmpty || email.isEmpty || password.isEmpty || nomor.isEmpty) {
       if (!mounted) return;
@@ -49,7 +48,7 @@ class _SignupPageState extends State<SignupPage> {
 
       if (user != null) {
         await AuthService()
-            .saveUserData(user.uid, nama, email, nomor, widget.role);
+            .saveUserData(user.uid, sapaan, nama, email, nomor, widget.role);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -71,33 +70,6 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  void loginGoogle(String role) async {
-    try {
-      await authService.signInWithGoogle(role: role);
-      if (mounted) {
-        if (widget.role == 'Guru') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => KelasPage(role: widget.role),
-            ),
-          );
-        } else if (widget.role == "Orang Tua") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePageOrangTua(role: widget.role),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("$e")));
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,8 +103,17 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         "Buat Akun ${widget.role}",
                         style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.w800),
+                          fontSize: 32,
+                          fontVariations: [FontVariation('wght', 800)],
+                        ),
                       ),
+                    ),
+                    Center(
+                        child: CustomTextField(
+                            label: "Nama sapaan(Pak/Bu)",
+                            controller: sapaanController)),
+                    SizedBox(
+                      height: 15,
                     ),
                     Center(
                         child: CustomTextField(
@@ -160,23 +141,6 @@ class _SignupPageState extends State<SignupPage> {
                             isPassword: true,
                             controller: passwordController)),
                     CustomButton(label: "Buat Akun", onPressed: signUp),
-                    Center(
-                      child: Text(
-                        "Atau lanjutkan dengan Google",
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w400),
-                      ),
-                    ),
-                    SizedBox(
-                      width: width * 0.12,
-                      height: height * 0.08,
-                      child: IconButton(
-                        onPressed: () => loginGoogle(widget.role),
-                        icon: Image.asset("assets/icons/Google_Icon.png"),
-                      ),
-                    ),
                   ],
                 ),
               ),

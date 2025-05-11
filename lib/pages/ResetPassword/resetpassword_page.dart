@@ -30,7 +30,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       await authService.resetPassword(email: email);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => SuccessPage(role: widget.role)),
+        MaterialPageRoute(
+            builder: (context) => SuccessPage(
+                  role: widget.role,
+                  isProfile: false,
+                )),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

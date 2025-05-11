@@ -47,12 +47,19 @@ class _KelasPageState extends State<KelasPage> {
           .get();
       final data = doc.data();
       if (data != null) {
+        final String sapaan = data['sapaan'] ?? '';
+        final String name = data['name'] ?? '';
         setState(() {
-          namaUser = data['name'] ?? 'Pengguna';
+          if (sapaan.isNotEmpty) {
+            namaUser = '$sapaan $name';
+          } else {
+            namaUser = name.isNotEmpty ? name : 'Pengguna';
+          }
         });
       }
     }
   }
+
 
   void logout() async {
     await authService.signOut();

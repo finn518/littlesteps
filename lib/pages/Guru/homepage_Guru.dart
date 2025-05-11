@@ -54,8 +54,14 @@ class _HomepageGuruState extends State<HomepageGuru> {
           .get();
       final data = doc.data();
       if (data != null) {
+        final String sapaan = data['sapaan'] ?? '';
+        final String name = data['name'] ?? '';
         setState(() {
-          namaUser = data['name'] ?? 'Pengguna';
+          if (sapaan.isNotEmpty) {
+            namaUser = '$sapaan $name';
+          } else {
+            namaUser = name.isNotEmpty ? name : 'Pengguna';
+          }
         });
       }
     }

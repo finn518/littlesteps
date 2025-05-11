@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
 
@@ -8,6 +9,7 @@ class ResetPasswordFlow extends StatelessWidget {
   final Widget? body;
   final String buttonText;
   final bool? sendAgain;
+  final bool? isLogin; 
   final VoidCallback onButtonPressed;
 
   const ResetPasswordFlow({
@@ -16,6 +18,7 @@ class ResetPasswordFlow extends StatelessWidget {
     required this.subtitle,
     this.sendAgain,
     this.body,
+    this.isLogin,
     required this.buttonText,
     required this.onButtonPressed,
   });
@@ -26,13 +29,23 @@ class ResetPasswordFlow extends StatelessWidget {
     final height = DeviceDimensions.height(context);
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(
-            Icons.arrow_back,
-            size: 36,
-          ),
-        ),
+        leading: isLogin == true
+            ? IconButton(
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomePageOrangTua(role: "Orang Tua"),
+                    ),
+                    (route) => false,
+                  );
+                },
+                icon: const Icon(Icons.arrow_back, size: 36),
+              )
+            : IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back, size: 36),
+              ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(

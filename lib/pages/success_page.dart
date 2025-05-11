@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:littlesteps/model/anak.dart';
+import 'package:littlesteps/pages/ProfilSiswa/profilsiswa_page.dart';
 import 'package:littlesteps/pages/login_page.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
 
 class SuccessPage extends StatelessWidget {
+  final Anak? anak;
   final String role;
-  const SuccessPage({super.key, required this.role});
+  final bool isProfile;
+
+  const SuccessPage(
+      {super.key, required this.role, required this.isProfile, this.anak});
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +55,36 @@ class SuccessPage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Tombol Lanjutkan
-              CustomButton(label: "Lanjutkan", onPressed: (){
-                Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => LoginPage(role: role)));
-              },)
+              CustomButton(
+                label: "Lanjutkan",
+                onPressed: () {
+                  if (isProfile) {
+                    if (anak == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Data anak tidak tersedia")),
+                      );
+                      return;
+                    }
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfilSiswaPage(
+                          siswa: anak!,
+                          role: role,
+                        ),
+                      ),
+                    );
+                  } else {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoginPage(role: role),
+                      ),
+                    );
+                  }
+                },
+              )
             ],
           ),
         ),

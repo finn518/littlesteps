@@ -72,9 +72,11 @@ class AuthService {
   }
 
   Future<void> saveUserData(
-      String uid, String nama, String email, String nomor, String role) async {
+      String uid, String sapaan, String nama,
+      String email, String nomor, String role) async {
     try {
       await firestore.collection('users').doc(uid).set({
+        'sapaan': sapaan,
         'name': nama,
         'email': email,
         'nomor': nomor,

@@ -24,7 +24,7 @@ class NewPasswordPage extends StatelessWidget {
       ), 
       onButtonPressed: (){
         Navigator.push(
-              context, MaterialPageRoute(builder: (_) => SuccessPage(role: role,)));
+              context, MaterialPageRoute(builder: (_) => SuccessPage(role: role, isProfile: false,)));
       }
     );
   }

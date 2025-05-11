@@ -1,53 +1,70 @@
+import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import '../../model/anak.dart';
 
-class koneksiSiswaPage extends StatefulWidget {
+class KoneksiSiswaPage extends StatefulWidget {
+  final String kelasId;
+  const KoneksiSiswaPage({super.key, required this.kelasId});
+
   @override
   _KoneksiSiswaPageState createState() => _KoneksiSiswaPageState();
 }
 
-class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
-  String? selectedKelas;
+class _KoneksiSiswaPageState extends State<KoneksiSiswaPage> {
   ScrollController _scrollController = ScrollController();
   Map<String, String> kodeKelas = {};
   Map<String, DateTime> codeGeneratedTimes = {};
 
-  // List<Siswa> get currentSiswaList {
-  //   if (selectedKelas == 'Kelas A') {
-  //     return siswaKelasA;
-  //   } else if (selectedKelas == 'Kelas B') {
-  //     return siswaKelasB;
-  //   } else {
-  //     return [];
-  //   }
-  // }
-
-  String generateRandomCode(int length) {
-    const chara = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    Random random = Random();
-    return String.fromCharCodes(Iterable.generate(
-      length,
-      (_) => chara.codeUnitAt(random.nextInt(chara.length)),
-    ));
+  String randomCode({int length = 6}) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final rand = Random();
+    return List.generate(length, (index) => chars[rand.nextInt(chars.length)])
+        .join();
   }
 
-  void _showHubungkanDialog(Anak siswa) {
-    DateTime now = DateTime.now();
-    String? existingCode = kodeKelas[selectedKelas];
-    DateTime? generatedAt = codeGeneratedTimes[selectedKelas];
+  Future<void> _updateStudentSpecialCode(
+      String kelasId, String studentId) async {
+    final newCode = randomCode();
+    final now = DateTime.now();
 
-    //Ini buat kalau kode belum ada atau udh lebih dari 3 jam bakal generate baru
-    if (existingCode == null ||
-        generatedAt == null ||
-        now.difference(generatedAt).inHours >= 3) {
-      String newCode = generateRandomCode(6);
-      kodeKelas[selectedKelas!] = newCode;
-      codeGeneratedTimes[selectedKelas!] = now;
-      existingCode = newCode;
+    await FirebaseFirestore.instance
+        .collection('kelas')
+        .doc(kelasId)
+        .collection('anak')
+        .doc(studentId)
+        .update({
+      'specialCode': newCode,
+      'codeGeneratedAt': now,
+    });
+
+    setState(() {
+      kodeKelas[studentId] = newCode;
+      codeGeneratedTimes[studentId] = now;
+    });
+  }
+
+  void _showHubungkanDialog(Anak siswa) async {
+    DateTime now = DateTime.now();
+    bool needNewCode = siswa.specialCode == null ||
+        siswa.codeGeneratedAt == null ||
+        now.difference(siswa.codeGeneratedAt!).inHours >= 3;
+
+    if (needNewCode) {
+      await _updateStudentSpecialCode(siswa.idKelas, siswa.id);
     }
+
+    final doc = await FirebaseFirestore.instance
+        .collection('kelas')
+        .doc(siswa.idKelas)
+        .collection('anak')
+        .doc(siswa.id)
+        .get();
+
+    final updatedSiswa = Anak.fromMap(doc.data() as Map<String, dynamic>);
+    final existingCode = updatedSiswa.specialCode;
 
     showDialog(
       context: context,
@@ -61,8 +78,7 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // <-- supaya semua rata kiri
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Align(
                 alignment: Alignment.topRight,
@@ -86,31 +102,37 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 2,
-                    style: BorderStyle.solid,
-                  ),
+                  border: Border.all(color: Colors.grey, width: 2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      existingCode ?? '',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 4,
+                    GestureDetector(
+                      onTap: () {
+                        if (existingCode != null) {
+                          Clipboard.setData(ClipboardData(text: existingCode));
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Kode telah disalin ke clipboard'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        existingCode ?? 'Kode tidak tersedia',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 4,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Demi alasan keamanan, kode akan direset dalam 3 jam kemudian',
+                    Text(
+                      'Kode akan direset dalam ${3 - DateTime.now().difference(updatedSiswa.codeGeneratedAt ?? DateTime.now()).inHours} jam',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                      ),
+                      style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
                   ],
                 ),
@@ -118,10 +140,7 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
               const SizedBox(height: 20),
               const Text(
                 'Instruksi Orang Tua',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 10),
               const Text(
@@ -129,10 +148,7 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
                 '2. Klik menu profil yang berada pada kiri atas halaman\n'
                 '3. Klik "informasi anak"\n'
                 '4. Masukkan kode di atas untuk bergabung ke kelas',
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 1.5,
-                ),
+                style: TextStyle(fontSize: 14, height: 1.5),
               ),
             ],
           ),
@@ -143,229 +159,205 @@ class _KoneksiSiswaPageState extends State<koneksiSiswaPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final int jumlahTidakTerhubung =
-    //     currentSiswaList.where((siswa) => !siswa.isConnected).length;
-    // final int jumlahTerhubung =
-    //     currentSiswaList.where((siswa) => siswa.isConnected).length;
-
     return Scaffold(
-        // appBar: AppBar(
-        //   backgroundColor: Colors.transparent,
-        //   elevation: 0,
-        //   title: Text(
-        //     'Koneksi Siswa',
-        //     style: TextStyle(fontWeight: FontWeight.bold),
-        //   ),
-        //   centerTitle: true,
-        //   leading: IconButton(
-        //     onPressed: () {
-        //       Navigator.pop(context);
-        //     },
-        //     icon: Icon(Icons.arrow_back),
-        //   ),
-        // ),
-        // body: Column(
-        //   children: [
-        //     Padding(
-        //       padding: const EdgeInsets.all(16),
-        //       child: Row(
-        //         children: [
-        //           Expanded(
-        //             child: ElevatedButton(
-        //               style: ElevatedButton.styleFrom(
-        //                 backgroundColor: Color(0xFF53B1FD),
-        //                 shape: RoundedRectangleBorder(
-        //                   borderRadius: BorderRadius.circular(18),
-        //                 ),
-        //                 side: BorderSide(color: Colors.black, width: 1),
-        //               ),
-        //               onPressed: () {
-        //                 setState(() {
-        //                   selectedKelas = 'Kelas A';
-        //                 });
-        //                 WidgetsBinding.instance.addPostFrameCallback((_) {
-        //                   if (_scrollController.hasClients) {
-        //                     _scrollController.animateTo(0,
-        //                         duration: Duration(milliseconds: 300),
-        //                         curve: Curves.easeInOut);
-        //                   }
-        //                 });
-        //               },
-        //               child: Text(
-        //                 'Kelas A',
-        //                 style: TextStyle(
-        //                   color: Colors.black,
-        //                   fontWeight: FontWeight.bold,
-        //                 ),
-        //               ),
-        //             ),
-        //           ),
-        //           const SizedBox(width: 12),
-        //           Expanded(
-        //             child: ElevatedButton(
-        //               style: ElevatedButton.styleFrom(
-        //                 backgroundColor: Color(0xFFFDE272),
-        //                 shape: RoundedRectangleBorder(
-        //                   borderRadius: BorderRadius.circular(18),
-        //                 ),
-        //                 side: BorderSide(color: Colors.black, width: 1),
-        //               ),
-        //               onPressed: () {
-        //                 setState(() {
-        //                   selectedKelas = 'Kelas B';
-        //                 });
-        //                 WidgetsBinding.instance.addPostFrameCallback((_) {
-        //                   if (_scrollController.hasClients) {
-        //                     _scrollController.animateTo(0,
-        //                         duration: Duration(milliseconds: 300),
-        //                         curve: Curves.easeInOut);
-        //                   }
-        //                 });
-        //               },
-        //               child: Text(
-        //                 'Kelas B',
-        //                 style: TextStyle(
-        //                   color: Colors.black,
-        //                   fontWeight: FontWeight.bold,
-        //                 ),
-        //               ),
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //     ),
-        //     const Divider(
-        //       color: Colors.black,
-        //     ),
-        //     Padding(
-        //       padding: const EdgeInsets.all(8.0),
-        //       child: Text(
-        //         selectedKelas ?? 'Pilih Kelas',
-        //         style: const TextStyle(
-        //           fontSize: 16,
-        //           fontWeight: FontWeight.bold,
-        //         ),
-        //       ),
-        //     ),
-        //     SizedBox(height: 10),
-        //     if (selectedKelas != null)
-        //       Expanded(
-        //         child: ListView(
-        //           controller: _scrollController,
-        //           padding: const EdgeInsets.all(8.0),
-        //           children: [
-        //             // Text(
-        //             //   'TIDAK TERHUBUNG ($jumlahTidakTerhubung)',
-        //             //   style: const TextStyle(
-        //             //       fontWeight: FontWeight.bold, fontSize: 16),
-        //             // ),
-        //             const SizedBox(height: 8),
-        //             ...currentSiswaList
-        //                 .where((siswa) => !siswa.isConnected)
-        //                 .map((siswa) {
-        //               return Container(
-        //                 margin: const EdgeInsets.symmetric(vertical: 3),
-        //                 padding: const EdgeInsets.symmetric(
-        //                     horizontal: 12, vertical: 8),
-        //                 color: Colors.white,
-        //                 child: Row(
-        //                   crossAxisAlignment: CrossAxisAlignment.start,
-        //                   children: [
-        //                     Image.asset(
-        //                       siswa.imagePath,
-        //                       width: 40,
-        //                       height: 40,
-        //                     ),
-        //                     const SizedBox(width: 10),
-        //                     Expanded(
-        //                       child: Column(
-        //                         crossAxisAlignment: CrossAxisAlignment.start,
-        //                         children: [
-        //                           Text(
-        //                             'Tidak ada orang tua yang terhubung dengan ${siswa.name}',
-        //                             style: const TextStyle(
-        //                               color: Colors.black,
-        //                               fontSize: 16,
-        //                             ),
-        //                           ),
-        //                           const SizedBox(height: 8),
-        //                           ElevatedButton.icon(
-        //                             onPressed: () {
-        //                               _showHubungkanDialog(siswa);
-        //                             },
-        //                             style: ElevatedButton.styleFrom(
-        //                               backgroundColor: Colors.white,
-        //                               shape: RoundedRectangleBorder(
-        //                                 borderRadius: BorderRadius.circular(8),
-        //                               ),
-        //                               side: BorderSide(
-        //                                   color: Colors.grey, width: 1),
-        //                               padding: const EdgeInsets.symmetric(
-        //                                   horizontal: 12, vertical: 8),
-        //                             ),
-        //                             icon: Icon(Icons.add,
-        //                                 color: Colors.black, size: 18),
-        //                             label: const Text(
-        //                               'Hubungkan Orang Tua',
-        //                               style: TextStyle(color: Colors.black),
-        //                             ),
-        //                           ),
-        //                         ],
-        //                       ),
-        //                     )
-        //                   ],
-        //                 ),
-        //               );
-        //             }),
-        //             const SizedBox(height: 20),
-        //             Text(
-        //               'SUDAH TERHUBUNG ($jumlahTerhubung)',
-        //               style: const TextStyle(
-        //                   fontWeight: FontWeight.bold, fontSize: 16),
-        //             ),
-        //             const SizedBox(height: 8),
-        //             ...currentSiswaList
-        //                 .where((siswa) => siswa.isConnected)
-        //                 .map((siswa) {
-        //               return Container(
-        //                 margin: const EdgeInsets.symmetric(vertical: 3),
-        //                 padding: const EdgeInsets.symmetric(
-        //                     horizontal: 12, vertical: 8),
-        //                 color: Colors.white,
-        //                 child: Row(
-        //                   children: [
-        //                     Image.asset(
-        //                       siswa.imagePath,
-        //                       width: 40,
-        //                       height: 40,
-        //                     ),
-        //                     const SizedBox(width: 10),
-        //                     Expanded(
-        //                       child: Column(
-        //                         crossAxisAlignment: CrossAxisAlignment.start,
-        //                         children: [
-        //                           Text(
-        //                             'Orang Tua ${siswa.name}',
-        //                             style: const TextStyle(
-        //                                 fontWeight: FontWeight.bold),
-        //                           ),
-        //                           const SizedBox(height: 4),
-        //                           Text(
-        //                             '${siswa.parentName}',
-        //                             style: const TextStyle(color: Colors.black54),
-        //                           ),
-        //                         ],
-        //                       ),
-        //                     ),
-        //                   ],
-        //                 ),
-        //               );
-        //             })
-        //           ],
-        //         ),
-        //       ),
-        //   ],
-        // ),
-        );
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, size: 36),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "Koneksi Siswa",
+          style: TextStyle(
+            fontVariations: [FontVariation('wght', 800)],
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('kelas')
+            .doc(widget.kelasId) // Menggunakan widget.kelasId
+            .collection('anak')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final siswaList = snapshot.data!.docs.map((doc) {
+            return Anak.fromMap(doc.data() as Map<String, dynamic>);
+          }).toList();
+
+          final jumlahTidakTerhubung =
+              siswaList.where((siswa) => !siswa.isConnected).length;
+          final jumlahTerhubung =
+              siswaList.where((siswa) => siswa.isConnected).length;
+
+          return Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  controller: _scrollController,
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Text(
+                        'TIDAK TERHUBUNG ($jumlahTidakTerhubung)',
+                        style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...siswaList
+                        .where((siswa) => !siswa.isConnected)
+                        .map((siswa) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
+                        color: Colors.white,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: siswa.fotoPath.startsWith('http')
+                                      ? NetworkImage(siswa.fotoPath)
+                                          as ImageProvider
+                                      : FileImage(File(siswa.fotoPath)),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Tidak ada orang tua yang terhubung dengan ${siswa.namaPanggilan}',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontVariations: [
+                                          FontVariation('wght', 500)
+                                        ]),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _showHubungkanDialog(siswa);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      side: const BorderSide(
+                                          color: Colors.grey, width: 1),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                    ),
+                                    icon: const Icon(Icons.add,
+                                        color: Colors.black, size: 18),
+                                    label: const Text(
+                                      'Hubungkan Orang Tua',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xff3C4257),
+                                          fontVariations: [
+                                            FontVariation('wght', 600)
+                                          ]),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Text(
+                        'SUDAH TERHUBUNG ($jumlahTerhubung)',
+                        style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...siswaList
+                        .where((siswa) => siswa.isConnected)
+                        .map((siswa) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
+                        color: Colors.white,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: siswa.fotoPath.startsWith('http')
+                                      ? NetworkImage(siswa.fotoPath)
+                                          as ImageProvider
+                                      : FileImage(File(siswa.fotoPath)),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Orang Tua ${siswa.namaPanggilan}',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontVariations: [
+                                          FontVariation('wght', 500)
+                                        ]),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${siswa.parentName}',
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xffA5ACB8),
+                                        fontVariations: [
+                                          FontVariation('wght', 600)
+                                        ]),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    })
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }

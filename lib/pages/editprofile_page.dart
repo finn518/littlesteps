@@ -26,6 +26,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final emailController = TextEditingController();
   final namaController = TextEditingController();
   final nomerController = TextEditingController();
+  final sapaanController = TextEditingController();
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final data = doc.data();
       if (data != null) {
         setState(() {
+          sapaanController.text = data['sapaan'] ?? '';
           namaController.text = data['name'] ?? '';
           emailController.text = data['email'] ?? '';
           nomerController.text = data['nomor'] ?? '';
@@ -56,6 +58,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final newName = namaController.text.trim();
     final newEmail = emailController.text.trim();
     final newNumber = nomerController.text.trim();
+    final newSapaan = sapaanController.text.trim();
     final currentEmail = user?.email ?? '';
 
     if (user == null) return;
@@ -81,6 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
         // Tetap update data lain di Firestore meskipun email butuh verifikasi
         await authService.firestore.collection('users').doc(uid).update({
+          'sapaan': newSapaan,
           'name': newName,
           'email': newEmail,
           'nomor': newNumber,
@@ -99,6 +103,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       } else {
         // Jika email tidak berubah, cukup update data lainnya
         await authService.firestore.collection('users').doc(user.uid).update({
+          'sapaan': newSapaan,
           'name': newName,
           'nomor': newNumber,
         });
@@ -178,6 +183,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   horizontal: width * 0.14, vertical: height * 0.01),
               child: Column(
                 children: [
+                  CustomTextField(
+                      label: "Nama sapaan (Pak/Bu)",
+                      controller: sapaanController),
+                  SizedBox(
+                    height: 20,
+                  ),
                   CustomTextField(label: "Nama", controller: namaController),
                   SizedBox(
                     height: 20,
