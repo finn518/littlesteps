@@ -5,32 +5,41 @@ class CardCatatan extends StatelessWidget {
   final int number;
   final String title;
   final Widget body;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
   const CardCatatan({
     super.key,
     required this.number,
     required this.body,
     required this.title,
     this.reverse,
+    this.onTap,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
     final isReversed = reverse ?? false;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black, width: 1),
-        borderRadius: isReversed
-            ? null // No border radius when reversed
-            : BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: isReversed ? _buildReversedLayout() : _buildNormalLayout(),
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, width: 1),
+          borderRadius: isReversed
+              ? null // No border radius when reversed
+              : BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(20),
+                ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: isReversed ? _buildReversedLayout() : _buildNormalLayout(),
+        ),
       ),
     );
   }

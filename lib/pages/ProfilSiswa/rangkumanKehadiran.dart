@@ -1,9 +1,66 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class RangkumanKehadiran extends StatelessWidget {
-  const RangkumanKehadiran({super.key});
+class RangkumanKehadiran extends StatefulWidget {
+  final String kelasId;
+  final String siswaId;
 
-  Widget semesterCard(String semester) {
+  const RangkumanKehadiran(
+      {super.key, required this.kelasId, required this.siswaId});
+
+  @override
+  State<RangkumanKehadiran> createState() => _RangkumanKehadiranState();
+}
+
+class _RangkumanKehadiranState extends State<RangkumanKehadiran> {
+  final Map<int, Map<String, int>> rekap = {};
+
+  @override
+  void initState() {
+    super.initState();
+    ambilDataKehadiran();
+  }
+
+  Future<void> ambilDataKehadiran() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('kelas')
+        .doc(widget.kelasId)
+        .collection('kehadiran')
+        .where('siswaId', isEqualTo: widget.siswaId)
+        .get();
+
+    final data = <int, Map<String, int>>{};
+
+    for (var doc in snapshot.docs) {
+      final semester = doc['semester'] ?? 0;
+      final status = (doc['status'] ?? 'Absen') as String;
+
+      if (!data.containsKey(semester)) {
+        data[semester] = {
+          'Hadir': 0,
+          'Sakit': 0,
+          'Izin': 0,
+          'Absen': 0,
+        };
+      }
+      data[semester]![status] = (data[semester]![status] ?? 0) + 1;
+    }
+
+    setState(() {
+      rekap.clear();
+      rekap.addAll(data);
+    });
+  }
+
+  Widget semesterCard(int semester) {
+    final info = rekap[semester] ??
+        {
+          'Hadir': 0,
+          'Sakit': 0,
+          'Izin': 0,
+          'Absen': 0,
+        };
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -29,26 +86,26 @@ class RangkumanKehadiran extends StatelessWidget {
             color: Colors.black,
             thickness: 1.5,
           ),
-          const Text(
-            'Hadir : ',
+          Text(
+            'Hadir : ${info['Hadir']}',
             style: TextStyle(
               fontVariations: [FontVariation('wght', 600)],
             ),
           ),
-          const Text(
-            'Sakit : ',
+          Text(
+            'Sakit : ${info['Sakit']}',
             style: TextStyle(
               fontVariations: [FontVariation('wght', 600)],
             ),
           ),
-          const Text(
-            'Izin : ',
+          Text(
+            'Izin : ${info['Izin']}',
             style: TextStyle(
               fontVariations: [FontVariation('wght', 600)],
             ),
           ),
-          const Text(
-            'Alpa : ',
+          Text(
+            'Alpa : ${info['Absen']}',
             style: TextStyle(
               fontVariations: [FontVariation('wght', 600)],
             ),
@@ -81,11 +138,7 @@ class RangkumanKehadiran extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          semesterCard('1'),
-          semesterCard('2'),
-          semesterCard('3'),
-          semesterCard('4'),
-          semesterCard('5'),
+          for (var i = 1; i <= 4; i++) semesterCard(i),
         ],
       ),
     );

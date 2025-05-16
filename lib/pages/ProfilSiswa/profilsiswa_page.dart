@@ -1,18 +1,20 @@
 import 'dart:io';
-import 'dart:ui';
+
 import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
+import "package:firebase_auth/firebase_auth.dart" as auth;
 import "package:flutter/material.dart";
-import "package:littlesteps/pages/Guru/KelasPage.dart";
-import "package:littlesteps/pages/Guru/laporanPerkembanganGuruPage.dart";
-import "package:littlesteps/pages/Guru/rangkumanKehadiran.dart";
+import 'package:image_picker/image_picker.dart';
 import "package:littlesteps/model/anak.dart";
+import "package:littlesteps/pages/Guru/KelasPage.dart";
+import "package:littlesteps/pages/ProfilSiswa/laporanPerkembanganGuruPage.dart";
 import "package:littlesteps/pages/OrangTua/homepage_OrangTua.dart";
 import "package:littlesteps/pages/ProfilSiswa/catatankesehatan_page.dart";
+import "package:littlesteps/pages/ProfilSiswa/rangkumanKehadiran.dart";
 import "package:littlesteps/pages/ProfilSiswa/rangkumanpenilaian_page.dart";
 import "package:littlesteps/utils/auth_service.dart";
 import "package:littlesteps/utils/device_dimension.dart";
 import 'package:littlesteps/widgets/appBackground.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilSiswaPage extends StatefulWidget {
   final Anak siswa;
@@ -25,8 +27,9 @@ class ProfilSiswaPage extends StatefulWidget {
 
 class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
   final authService = AuthService();
-  User? _user;
+  auth.User? _user;
   Anak? anak;
+  File? selectedImage;
 
   Future<void> _disconnectChild() async {
     final firestore = FirebaseFirestore.instance;
@@ -98,6 +101,217 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
       );
     }
   }
+
+  Future<Anak?> ambilDataAnak() async {
+    final doc = FirebaseFirestore.instance
+        .collection('kelas')
+        .doc(widget.siswa.idKelas)
+        .collection('anak')
+        .doc(widget.siswa.id);
+    final snapshot = await doc.get();
+
+    if (snapshot.exists) {
+      return Anak.fromMap(snapshot.data()!);
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> pickImage(Function setModalState) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      selectedImage = File(picked.path);
+      setModalState(() {});
+    }
+  }
+
+  Future<List<String>> _uploadAllImages() async {
+    if (selectedImage == null) return [];
+
+    final List<String> uploadedUrls = [];
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'images/$fileName.jpg';
+
+    final response = await Supabase.instance.client.storage
+        .from('anak')
+        .upload(path, selectedImage!);
+
+    if (response.isEmpty) {
+      throw Exception("Upload failed");
+    }
+
+    final publicUrl =
+        Supabase.instance.client.storage.from('anak').getPublicUrl(path);
+
+    uploadedUrls.add(publicUrl);
+
+    return uploadedUrls;
+  }
+
+  void showEditSiswaForm(BuildContext context, Map<String, dynamic> siswaData) {
+    String namaBaru = siswaData['nama'] ?? '';
+    String panggilan = siswaData['namaPanggilan'] ?? '';
+    String existingImage = siswaData['fotoPath'] ?? '';
+    selectedImage = null; // reset
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      isScrollControlled: true,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                left: 20,
+                right: 20,
+                top: 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Edit Profil Siswa',
+                    style: TextStyle(
+                      fontVariations: [FontVariation('wght', 800)],
+                      fontSize: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: TextEditingController(text: namaBaru),
+                    decoration: InputDecoration(
+                      hintText: 'Tulis nama lengkap siswa disini...',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      hintStyle: TextStyle(fontFamily: 'Poppins'),
+                    ),
+                    onChanged: (val) => namaBaru = val,
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: TextEditingController(text: panggilan),
+                    decoration: InputDecoration(
+                      hintText: 'Tulis nama panggilan siswa disini...',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      hintStyle: TextStyle(fontFamily: 'Poppins'),
+                    ),
+                    onChanged: (val) => panggilan = val,
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () => pickImage(setModalState),
+                    child: Container(
+                      width: double.infinity,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: selectedImage != null
+                            ? Image.file(selectedImage!, fit: BoxFit.cover)
+                            : (existingImage.isNotEmpty
+                                ? Image.network(existingImage,
+                                    fit: BoxFit.cover)
+                                : const Icon(Icons.image,
+                                    size: 50, color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (namaBaru.isNotEmpty && panggilan.isNotEmpty) {
+                          try {
+                            String imageUrl = existingImage;
+                            if (selectedImage != null) {
+                              List<String> uploadedUrls =
+                                  await _uploadAllImages();
+                              if (uploadedUrls.isNotEmpty) {
+                                imageUrl = uploadedUrls.first;
+                              }
+                            }
+
+                            final siswaDoc = FirebaseFirestore.instance
+                                .collection('kelas')
+                                .doc(widget.siswa.idKelas)
+                                .collection('anak')
+                                .doc(siswaData['id']);
+
+                            await siswaDoc.update({
+                              'nama': namaBaru,
+                              'namaPanggilan': panggilan,
+                              'fotoPath': imageUrl,
+                            });
+
+                            setState(() {
+                              selectedImage = null;
+                              ambilDataAnak();
+                            });
+
+                            Navigator.pop(context, true);
+                          } catch (e) {
+                            print("Gagal mengedit data siswa: $e");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Gagal mengedit data siswa")),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    "Nama lengkap dan panggilan wajib diisi")),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Edit Profil Siswa',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontFamily: 'Poppins'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
@@ -132,7 +346,10 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
           IconButton(
             padding: const EdgeInsets.only(right: 15),
             onPressed: () {},
-            icon: const Icon(Icons.download_for_offline_outlined, size: 48),
+            icon: ImageIcon(
+              AssetImage('assets/icons/download.png'),
+              size: 30,
+            ),
           )
         ],
       ),
@@ -143,11 +360,42 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
             padding: EdgeInsets.symmetric(horizontal: width * 0.075),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 70,
-                  backgroundImage: widget.siswa.fotoPath.startsWith('http')
-                      ? NetworkImage(widget.siswa.fotoPath)
-                      : FileImage(File(widget.siswa.fotoPath)) as ImageProvider,
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundImage: widget.siswa.fotoPath.startsWith('http')
+                          ? NetworkImage(widget.siswa.fotoPath)
+                          : FileImage(File(widget.siswa.fotoPath))
+                              as ImageProvider,
+                    ),
+                    if (widget.role == "Guru")
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: CircleAvatar(
+                          radius: 22, // Lingkaran luar putih
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 16, // Lingkaran biru muda
+                            backgroundColor: Colors.blue[100],
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: ImageIcon(
+                                AssetImage('assets/icons/edit.png'),
+                                color: Colors.black,
+                                size: 18,
+                              ),
+                              onPressed: () {
+                                showEditSiswaForm(
+                                    context, widget.siswa.toMap());
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 25),
                 Text(
@@ -163,7 +411,10 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => CatatankesehatanPage(role: widget.role),
+                      builder: (_) => CatatankesehatanPage(
+                        role: widget.role,
+                        siswa: widget.siswa,
+                      ),
                     ),
                   );
                 }),
@@ -172,8 +423,10 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          LaporanPerkembanganGuru(role: widget.role),
+                      builder: (_) => LaporanPerkembanganGuru(
+                        role: widget.role,
+                        siswa: widget.siswa,
+                      ),
                     ),
                   );
                 }),
@@ -182,8 +435,10 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          RangkumanPerkembanganPage(role: widget.role),
+                      builder: (_) => RangkumanPerkembanganPage(
+                        role: widget.role,
+                        siswa: widget.siswa,
+                      ),
                     ),
                   );
                 }),
@@ -192,7 +447,9 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const RangkumanKehadiran(),
+                      builder: (_) => RangkumanKehadiran(
+                          kelasId: widget.siswa.idKelas,
+                          siswaId: widget.siswa.id),
                     ),
                   );
                 }),

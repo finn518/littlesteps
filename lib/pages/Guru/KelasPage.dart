@@ -60,7 +60,6 @@ class _KelasPageState extends State<KelasPage> {
     }
   }
 
-
   void logout() async {
     await authService.signOut();
     if (!context.mounted) return;
@@ -224,24 +223,42 @@ class _KelasPageState extends State<KelasPage> {
                     isEdit ? 'Edit Kelas' : 'Buat Kelas',
                     style: TextStyle(
                       fontVariations: [FontVariation('wght', 800)],
-                      fontSize: 18,
+                      fontSize: 24,
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: namaController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Tulis nama kelas disini...',
                       border: OutlineInputBorder(),
+                      hintStyle: TextStyle(fontFamily: 'Poppins'),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
                     ),
                     onChanged: (val) => namaKelas = val,
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: tahunController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Tulis tahun angkatan disini...',
                       border: OutlineInputBorder(),
+                      hintStyle: TextStyle(fontFamily: 'Poppins'),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
                     ),
                     onChanged: (val) => tahunAngkatan = val,
                   ),
@@ -326,7 +343,8 @@ class _KelasPageState extends State<KelasPage> {
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            fontVariations: [FontVariation('wght', 800)]),
+                            fontVariations: [FontVariation('wght', 800)],
+                            fontFamily: 'Poppins'),
                       ),
                     ),
                   ),
@@ -380,16 +398,23 @@ class _KelasPageState extends State<KelasPage> {
                       ),
                     ),
                     Positioned(
-                      bottom: -20, // posisi setengah keluar dari gambar
+                      bottom: -20,
                       right: 16,
                       child: CircleAvatar(
-                        radius: 20,
+                        radius: 22, // Lingkaran putih (luar)
                         backgroundColor: Colors.white,
-                        child: IconButton(
-                          icon: Icon(Icons.edit, size: 18, color: Colors.blue),
-                          onPressed: () {
-                            showTambahEditKelasForm(context, kelas: kelas);
-                          },
+                        child: CircleAvatar(
+                          radius: 16, // Lingkaran biru muda (dalam)
+                          backgroundColor: Colors.blue[100],
+                          child: IconButton(
+                            icon: ImageIcon(
+                              AssetImage('assets/icons/edit.png'),
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              showTambahEditKelasForm(context, kelas: kelas);
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -412,8 +437,9 @@ class _KelasPageState extends State<KelasPage> {
                         "Angkatan ${kelas.tahunAngkatan}",
                         style: const TextStyle(
                           fontSize: 16,
-                          fontVariations: [FontVariation('wght', 600)],
+                          fontVariations: [FontVariation('wght', 800)],
                           color: Colors.black,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -555,7 +581,13 @@ class _KelasPageState extends State<KelasPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Kelas', style: Theme.of(context).textTheme.headlineMedium),
+            Text(
+              'Kelas',
+              style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontVariations: [FontVariation('wght', 800)],
+                  fontSize: 32),
+            ),
             const SizedBox(height: 16),
             Expanded(
               child: daftarKelas.isEmpty
