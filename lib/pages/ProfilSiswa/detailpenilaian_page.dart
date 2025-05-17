@@ -1,182 +1,160 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:littlesteps/model/rangkumanPenilaian.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class DetailPenilaianPage extends StatefulWidget {
   final String role;
-  const DetailPenilaianPage({super.key, required this.role});
+  final RangkumanPenilaian rangkuman;
+  const DetailPenilaianPage(
+      {super.key, required this.role, required this.rangkuman});
 
   @override
   State<DetailPenilaianPage> createState() => _DetailPenilaianPageState();
 }
 
 class _DetailPenilaianPageState extends State<DetailPenilaianPage> {
-  final kompetensi = TextEditingController();
-  String? selectedLevel;
-  Set<String> selectedLevels = {};
-
-  void _showTambahPPenilaian() {
-    final List<Map<String, dynamic>> levels = [
-      {'label': 'Belum Muncul', 'color': Color(0xFFFFF1F3)},
-      {'label': 'Mulai Muncul', 'color': Color(0xFFFEFBE8)},
-      {'label': 'Berkembang Sesuai Harapan', 'color': Color(0xFFEFF8FF)},
-      {'label': 'Berkembang Sangat Baik', 'color': Color(0xFFEDFCF2)},
-    ];
-
-    String? tempSelectedLevel = selectedLevel;
-
-    showModalBottomSheet(
+  void showDeleteDetailDialog(int indexToRemove) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 24,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Apakah Anda yakin ingin menghapus laporan penilaian?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontVariations: [FontVariation('wght', 800)],
+                ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Buat Penilaian Sub Kompetensi',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontVariations: [FontVariation('wght', 800)]),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: kompetensi,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Tulis sub kompetensi dasar disini...',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: Colors.white,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                  // Tombol Ya
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff0066FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.blue),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: levels.map((level) {
-                      final isSelected = tempSelectedLevel == level['label'];
-                      return GestureDetector(
-                        onTap: () {
-                          setModalState(() {
-                            tempSelectedLevel = level['label'];
-                          });
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: level['color'],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                          child: Text(
-                            level['label'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          selectedLevel = tempSelectedLevel;
-                        });
-                        print('Subkompetensi: ${kompetensi.text}');
-                        print('Level: $selectedLevel');
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        'Buat Jadwal',
+                    onPressed: () async {
+                      Navigator.pop(context); // Tutup dialog
+                      await deleteDetailPenilaian(
+                          widget.rangkuman.id, indexToRemove);
+                    },
+                    child: const Text("Ya",
                         style: TextStyle(
+                            fontVariations: [FontVariation('wght', 800)],
                             color: Colors.white,
-                            fontSize: 16,
-                              fontVariations: [FontVariation('wght', 800)])
+                            fontSize: 18)),
+                  ),
+                  const SizedBox(width: 16),
+                  // Tombol Tidak
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.black),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
                     ),
+                    onPressed: () => Navigator.pop(context), // Tutup dialog
+                    child: const Text("Tidak",
+                        style: TextStyle(
+                            fontVariations: [FontVariation('wght', 800)],
+                            color: Color(0xff0066FF),
+                            fontSize: 18)),
                   ),
                 ],
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );
   }
 
+  Future<void> deleteDetailPenilaian(
+      String idRangkumanPenilaian, int indexToRemove) async {
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection('kelas')
+          .doc(widget.rangkuman.kelasId)
+          .collection('rangkumanPenilaian')
+          .doc(idRangkumanPenilaian);
+
+      // Buat array baru tanpa elemen di index tersebut
+      List<String> newSubBab = List.from(widget.rangkuman.subBab);
+      List<String> newNilai = List.from(widget.rangkuman.nilai);
+
+      newSubBab.removeAt(indexToRemove);
+      newNilai.removeAt(indexToRemove);
+
+      // Update dokumen dengan array baru
+      await docRef.update({
+        'subBab': newSubBab,
+        'nilai': newNilai,
+      });
+
+      setState(() {
+        widget.rangkuman.subBab
+          ..clear()
+          ..addAll(newSubBab);
+        widget.rangkuman.nilai
+          ..clear()
+          ..addAll(newNilai);
+      });
+
+      debugPrint("Detail penilaian berhasil dihapus.");
+    } catch (e) {
+      debugPrint("Gagal menghapus detail penilaian: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
-    final isTeacher = widget.role == 'Guru';
+    final subBab = widget.rangkuman.subBab;
+    final nilai = widget.rangkuman.nilai;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
               size: 36,
             )),
       ),
       body: ListView(
-padding: EdgeInsets.symmetric(horizontal: width * 0.075),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.075),
         children: [
           Center(
             child: Text(
               "Laporan Penilaian",
-              style: TextStyle(
+              style: const TextStyle(
                 fontVariations: [FontVariation('wght', 800)],
                 fontSize: 28,
                 color: Colors.black,
               ),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Center(
             child: Text(
-              "Nilai Agama dan Moral",
-              style: TextStyle(
+              widget.rangkuman.kompetensiDasar,
+              style: const TextStyle(
                 fontVariations: [FontVariation('wght', 800)],
                 fontSize: 26,
                 color: Color(0xff707070),
@@ -184,31 +162,35 @@ padding: EdgeInsets.symmetric(horizontal: width * 0.075),
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(height: 40),
-          CardCatatan(
-            reverse: true,
-            number: 1,
-            body: content("Berdoa sebelum dan sesudah melaksanakan kegiatan"),
-            title: "Berkembang Sangat Baik",
-          ),
-          SizedBox(height: 15),
-          CardCatatan(
-            reverse: true,
-            number: 2,
-            body: content("Menyanyikan lagu-lagu keagamaan"),
-            title: "Berkembang Sangat Baik",
-          ),
-          SizedBox(height: 15),
+          const SizedBox(height: 40),
+          ...List.generate(subBab.length, (index) {
+            final sub = subBab[index];
+            final score =
+                index < nilai.length ? nilai[index] : "Belum ada nilai";
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: CardCatatan(
+                reverse: true,
+                number: index + 1,
+                body: content(sub),
+                title: score,
+                onLongPress: widget.role == 'Guru'
+                    ? () => showDeleteDetailDialog(index)
+                    : null,
+              ),
+            );
+          }),
         ],
       ),
-      floatingActionButton: isTeacher
-          ? FloatingActionButton(
-              onPressed: _showTambahPPenilaian,
-              backgroundColor: Colors.blue,
-              child: Icon(Icons.add, color: Colors.white),
-              shape: CircleBorder(),
-            )
-          : null,
+
+      // floatingActionButton: isTeacher
+      //     ? FloatingActionButton(
+      //         onPressed: _showTambahPPenilaian,
+      //         backgroundColor: Colors.blue,
+      //         child: const Icon(Icons.add, color: Colors.white),
+      //         shape: CircleBorder(),
+      //       )
+      //     : null,
     );
   }
 

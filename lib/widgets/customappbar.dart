@@ -35,9 +35,9 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const ImageIcon(
                   AssetImage(
-                    'assets/icons/Sidebar.png',
+                    'assets/icons/sidebar.png',
                   ),
-                  size: 40,
+                  size: 35,
                 )
               ],
             ),
@@ -49,8 +49,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           padding: EdgeInsets.only(right: width * 0.03),
           child: IconButton(
             icon: ImageIcon(
-              AssetImage('assets/icons/Notifikasi.png'),
-              size: 40,
+              AssetImage('assets/icons/notification.png'),
+              size: 30,
             ),
             color: Colors.black,
             onPressed: () {

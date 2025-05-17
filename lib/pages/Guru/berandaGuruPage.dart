@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:math';
+
 import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -247,7 +247,6 @@ class _BerandaGuruState extends State<BerandaGuru> {
 
   Future<void> _deleteSiswa(String siswaId) async {
     try {
-      // Pastikan kita menghapus dari koleksi yang benar
       final docRef = FirebaseFirestore.instance
           .collection('kelas')
           .doc(widget.kelasId)
@@ -266,7 +265,6 @@ class _BerandaGuruState extends State<BerandaGuru> {
 
       await docRef.delete();
 
-      // Hapus dari daftar lokal
       if (mounted) {
         setState(() {
           daftarSiswa.removeWhere((siswa) => siswa.id == siswaId);
@@ -285,10 +283,9 @@ class _BerandaGuruState extends State<BerandaGuru> {
     }
   }
 
-
   void showTambahSiswaForm(BuildContext context) {
-    String namaBaru = '';
-    String panggilan = '';
+    String namaBaru = ''.trim();
+    String panggilan = ''.trim();
     selectedImage = null;
 
     showModalBottomSheet(
@@ -314,21 +311,39 @@ class _BerandaGuruState extends State<BerandaGuru> {
                       'Buat Profil Siswa',
                       style: TextStyle(
                           fontVariations: [FontVariation('wght', 800)],
-                          fontSize: 18),
+                          fontSize: 24),
                     ),
                     const SizedBox(height: 16),
                     TextField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Tulis nama lengkap siswa disini...',
                         border: OutlineInputBorder(),
+                        hintStyle: TextStyle(fontFamily: 'Poppins'),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
                       ),
                       onChanged: (val) => namaBaru = val,
                     ),
                     const SizedBox(height: 16),
                     TextField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Tulis nama panggilan siswa disini...',
                         border: OutlineInputBorder(),
+                        hintStyle: TextStyle(fontFamily: 'Poppins'),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Color(0xFFC0C0C0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
                       ),
                       onChanged: (val) => panggilan = val,
                     ),
@@ -411,9 +426,10 @@ class _BerandaGuruState extends State<BerandaGuru> {
                         child: const Text(
                           'Buat profil siswa',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontFamily: 'Poppins'),
                         ),
                       ),
                     ),
@@ -444,8 +460,13 @@ class _BerandaGuruState extends State<BerandaGuru> {
                       child: _menuButton("assets/icons/guru_kalender.png",
                           'Calender', Color(0xFF8ED8FA), JadwalHarianPage())),
                   Expanded(
-                      child: _menuButton("assets/icons/guru_kehadiran.png",
-                          'Kehadiran', Color(0xFFFDE272), KehadiranPage())),
+                      child: _menuButton(
+                          "assets/icons/guru_kehadiran.png",
+                          'Kehadiran',
+                          Color(0xFFFDE272),
+                          KehadiranPage(
+                            kelasId: widget.kelasId,
+                          ))),
                   Expanded(
                       child: _menuButton(
                           "assets/icons/guru_koneksi_siswa.png",
