@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePageOrangTua> {
   User? _user;
   String namaUser = "pengguna";
   Anak? anak;
+  String kelasId = "";
   List<Widget> pages = [Beranda(), GaleriPage(), PesanPage()];
   int _selectedIndex = 0;
 
@@ -87,7 +88,7 @@ class _HomePageState extends State<HomePageOrangTua> {
 
       final bool connected = data['isConnected'] ?? false;
       final String anakId = data['anakId'] ?? '';
-      final String kelasId = data['kelasId'] ?? '';
+      kelasId = data['kelasId'] ?? '';
 
       if (connected && anakId.isNotEmpty && kelasId.isNotEmpty) {
         final anakRef = firestore
@@ -102,6 +103,7 @@ class _HomePageState extends State<HomePageOrangTua> {
           if (anakData != null) {
             setState(() {
               anak = Anak.fromMap(anakData);
+              kelasId = data['kelasId'] ?? '';
             });
           }
         } else {

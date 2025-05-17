@@ -33,7 +33,7 @@ class _HomepageGuruState extends State<HomepageGuru> {
     super.initState();
     pages = [
       BerandaGuru(kelasId: widget.kelasId, role: widget.role),
-      GaleriGuruPage(),
+      GaleriGuruPage(kelasId: widget.kelasId),
       PesanPage(),
     ];
     _loadUserData();

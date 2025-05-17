@@ -1,9 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:littlesteps/model/kelas.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:littlesteps/pages/Guru/KelasPage.dart';
-import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/login_page.dart';
 import 'package:littlesteps/utils/auth_service.dart';
@@ -22,6 +23,7 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final authService = AuthService();
   User? _user;
+  File? selectedImage;
 
   final emailController = TextEditingController();
   final namaController = TextEditingController();
@@ -243,62 +245,63 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 bottom: 0,
                 child: Container(
                   decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("assets/images/bgprofil.png"))),
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/bgprofil.png"),
+                    ),
+                  ),
                 ),
               ),
               Positioned(
-                  left: width * 0.32,
-                  bottom: -40,
-                  child: Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Color(0xff0066FF),
-                        child: CircleAvatar(
-                          radius: 65, //nanti dikecilin
-                          backgroundImage:
-                              AssetImage("assets/images/Bu_mira.png"),
+                left: width * 0.32,
+                bottom: -40,
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Color(0xff0066FF),
+                      child: CircleAvatar(
+                        radius: 65,
+                        backgroundImage:
+                            AssetImage("assets/images/Bu_mira.png"),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        try {
+                          await pickImage();
+                        } catch (e) {
+                          print("Error: $e");
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundColor: Colors.transparent,
+                        child: Image.asset(
+                          'assets/icons/Edit_profil.png',
+                          width: 50,
+                          height: 50,
                         ),
                       ),
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.transparent, // Biar transparan
-                        child: Stack(
-                          children: [
-                            ClipOval(
-                              child: Image.asset(
-                                'assets/icons/Edit_profil.png',
-                                fit: BoxFit.cover,
-                                width: 50, // ukuran sesuai radius * 2
-                                height: 50,
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                color: Colors
-                                    .transparent, // biar button transparan
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(50),
-                                  onTap: () {
-                                    // Aksi saat ditekan
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ))
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-        SizedBox(
-          height: 80,
-        )
+        SizedBox(height: 80),
       ],
     );
   }
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // Proses gambar yang dipilih
+      print("Gambar dipilih: ${image.path}");
+    }
+  }
+
 }

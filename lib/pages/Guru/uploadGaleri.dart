@@ -1,10 +1,15 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UploadGaleri extends StatefulWidget {
-  const UploadGaleri({super.key});
+  final String kelasId;
+  const UploadGaleri({super.key, required this.kelasId});
 
   @override
   State<UploadGaleri> createState() => _UploadGaleriState();
@@ -12,6 +17,7 @@ class UploadGaleri extends StatefulWidget {
 
 class _UploadGaleriState extends State<UploadGaleri> {
   final ImagePicker _picker = ImagePicker();
+  final _captionController = TextEditingController();
   XFile? _selectedFile;
 
   Future<void> handleUpload(String label) async {
@@ -76,8 +82,36 @@ class _UploadGaleriState extends State<UploadGaleri> {
     );
   }
 
+  Future<String?> _uploadFileToSupabase(XFile file) async {
+    try {
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final extension = file.path.split('.').last;
+      final path = 'images/$fileName.$extension';
+
+      final fileBytes = await file.readAsBytes();
+
+      final response = await Supabase.instance.client.storage
+          .from('postingan') // Sesuaikan dengan bucket Anda di Supabase
+          .uploadBinary(path, fileBytes);
+
+      if (response.isEmpty) {
+        throw Exception("Upload failed");
+      }
+
+      return Supabase.instance.client.storage
+          .from('postingan')
+          .getPublicUrl(path);
+    } catch (e) {
+      print('Error uploading to Supabase: $e');
+      return null;
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+    print(widget.kelasId);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -117,6 +151,7 @@ class _UploadGaleriState extends State<UploadGaleri> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
+                  controller: _captionController,
                   maxLines: 4,
                   decoration: InputDecoration(
                     hintText: "Tulis catatan Anda disini...",
@@ -180,7 +215,84 @@ class _UploadGaleriState extends State<UploadGaleri> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () async {
+                    final caption = _captionController.text.trim();
+
+                    if (_selectedFile == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(
+                                "Silakan pilih gambar atau video terlebih dahulu")),
+                      );
+                      return;
+                    }
+
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Pengguna belum login")),
+                      );
+                      return;
+                    }
+
+                    try {
+                      // 🔼 Upload file ke Supabase
+                      final fileUrl =
+                          await _uploadFileToSupabase(_selectedFile!);
+                      if (fileUrl == null) {
+                        throw Exception('Gagal mengunggah file ke Supabase');
+                      }
+
+                      // 🧠 Ambil data user dari koleksi Firestore 'users'
+                      final userDoc = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .get();
+
+                      final userData = userDoc.data();
+                      if (userData == null)
+                        throw Exception('Data pengguna tidak ditemukan');
+
+                      final userName =
+                          "${userData['sapaan']} ${userData['name']}";
+
+                      // 📅 Format tanggal
+                      final formattedDate = DateFormat('dd MMMM yyyy', 'id_ID')
+                          .format(DateTime.now());
+
+                      // 📝 Simpan data ke Firestore
+                      final postinganRef = FirebaseFirestore.instance
+                          .collection('kelas')
+                          .doc(widget.kelasId)
+                          .collection('postingan')
+                          .doc();
+
+                      await postinganRef.set({
+                        'id': postinganRef.id,
+                        'userName': userName,
+                        'dateUpload': formattedDate,
+                        'caption': caption,
+                        'filePath': fileUrl,
+                        'likes': 0,
+                        'createdAt': Timestamp.now(),
+                        'userId': user.uid,
+                      });
+
+                      // 🔄 Reset form
+                      setState(() {
+                        _selectedFile = null;
+                        _captionController.clear();
+                      });
+
+                      Navigator.pop(context); // Tutup halaman upload
+                      print('Postingan berhasil disimpan');
+                    } catch (e) {
+                      print('Error saving post: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Gagal mengunggah postingan")),
+                      );
+                    }
+                  },
                   child: Text(
                     "Unggah",
                     style: TextStyle(
