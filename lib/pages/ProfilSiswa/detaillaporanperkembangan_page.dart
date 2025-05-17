@@ -1,10 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:littlesteps/model/anak.dart';
+import 'package:littlesteps/model/detailLaporan.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/cardcatatan.dart';
 
 class DetailLaporanPerkembanganPage extends StatefulWidget {
   final String role;
-  const DetailLaporanPerkembanganPage({super.key, required this.role});
+  final Anak siswa;
+  final String temaId;
+  const DetailLaporanPerkembanganPage(
+      {super.key,
+      required this.role,
+      required this.siswa,
+      required this.temaId});
 
   @override
   State<DetailLaporanPerkembanganPage> createState() =>
@@ -13,10 +22,57 @@ class DetailLaporanPerkembanganPage extends StatefulWidget {
 
 class _DetailLaporanPerkembanganPageState
     extends State<DetailLaporanPerkembanganPage> {
-  final judul = TextEditingController();
-  final catatan = TextEditingController();
+  Future<void> _uploadUpdateDetailLaporan(DetailLaporan detailLaporan) async {
+    try {
+      final siswa = widget.siswa;
+      final siswaId = siswa.id;
+      final kelasId = siswa.idKelas;
 
-  void _showTambahPerkembangan() {
+      DocumentReference docRef;
+      if (detailLaporan.id!.isNotEmpty) {
+        //update yak
+        docRef = FirebaseFirestore.instance
+            .collection('kelas')
+            .doc(kelasId)
+            .collection('anak')
+            .doc(siswaId)
+            .collection('laporanPerkembangan')
+            .doc(widget.temaId)
+            .collection('detailLaporan')
+            .doc(detailLaporan.id);
+      } else {
+        // ini yg upload baru
+        docRef = FirebaseFirestore.instance
+            .collection('kelas')
+            .doc(kelasId)
+            .collection('anak')
+            .doc(siswaId)
+            .collection('laporanPerkembangan')
+            .doc(widget.temaId)
+            .collection('detailLaporan')
+            .doc();
+      }
+
+      await docRef.set({
+        'id': docRef.id,
+        'temaId': widget.temaId,
+        'judul': detailLaporan.judul,
+        'catatan': detailLaporan.catatan,
+        'createdAt': DateTime.now()
+      });
+
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('Error uploading data: $e');
+    }
+  }
+
+  void _showTambahEditPerkembangan(
+      BuildContext context, DetailLaporan? detailLaporan) {
+    final judul = TextEditingController(text: detailLaporan?.judul ?? '');
+    final catatan = TextEditingController(text: detailLaporan?.catatan ?? '');
+    final isEdit = detailLaporan != null;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -42,13 +98,16 @@ class _DetailLaporanPerkembanganPageState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Buat Laporan \nPerkembangan',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    isEdit
+                        ? 'Edit Laporan \nPerkembangan'
+                        : 'Buat Laporan \nPerkembangan',
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  // TextField for 'judul'
+                  // TextField utk judul
                   TextField(
                     controller: judul,
                     decoration: InputDecoration(
@@ -90,10 +149,15 @@ class _DetailLaporanPerkembanganPageState
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Debugging: Print values when submitting
-                        print('Judul: ${judul.text}');
-                        print('Catatan: ${catatan.text}');
-                        Navigator.pop(context);
+                        final updatedDetail = DetailLaporan(
+                            id: detailLaporan?.id ?? '',
+                            temaId: detailLaporan?.temaId ?? '',
+                            judul: judul.text.trim(),
+                            catatan: catatan.text.trim(),
+                            createdAt: isEdit
+                                ? detailLaporan!.createdAt
+                                : DateTime.now());
+                        _uploadUpdateDetailLaporan(updatedDetail);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
@@ -102,9 +166,11 @@ class _DetailLaporanPerkembanganPageState
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      child: const Text(
-                        'Buat Laporan Perkembangan',
-                        style: TextStyle(
+                      child: Text(
+                        isEdit
+                            ? 'Edit Laporan Perkembangan'
+                            : 'Buat Laporan Perkembangan',
+                        style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold),
@@ -120,6 +186,96 @@ class _DetailLaporanPerkembanganPageState
     );
   }
 
+  void showDeleteDetailLaporanDialog(
+      BuildContext context, String idDetailLaporan) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Apakah Anda yakin ingin menghapus catatan laporan?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontVariations: [FontVariation('wght', 800)],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Tombol Ya
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff0066FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context); // Tutup dialog
+                      await deleteDetailLaporan(idDetailLaporan);
+                    },
+                    child: const Text("Ya",
+                        style: TextStyle(
+                            fontVariations: [FontVariation('wght', 800)],
+                            color: Colors.white,
+                            fontSize: 18)),
+                  ),
+                  const SizedBox(width: 16),
+                  // Tombol Tidak
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.black),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                    ),
+                    onPressed: () => Navigator.pop(context), // Tutup dialog
+                    child: const Text("Tidak",
+                        style: TextStyle(
+                            fontVariations: [FontVariation('wght', 800)],
+                            color: Color(0xff0066FF),
+                            fontSize: 18)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> deleteDetailLaporan(String idDetailLaporan) async {
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection('kelas')
+          .doc(widget.siswa.idKelas)
+          .collection('anak')
+          .doc(widget.siswa.id)
+          .collection('laporanPerkembangan')
+          .doc(widget.temaId)
+          .collection('detailLaporan')
+          .doc(idDetailLaporan);
+      await docRef.delete();
+      setState(() {});
+
+      debugPrint("Catatan Kesehatan berhasil dihapus.");
+    } catch (e) {
+      debugPrint("Gagal menghapus Catatan Kesehatan: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
@@ -133,15 +289,15 @@ class _DetailLaporanPerkembanganPageState
               size: 36,
             )),
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.075),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Center(
             child: Text(
               "Laporan Perkembangan",
               style: TextStyle(
                 fontVariations: [FontVariation('wght', 800)],
-                fontSize: 28,
+                fontSize: 26,
                 color: Colors.black,
               ),
             ),
@@ -149,27 +305,80 @@ class _DetailLaporanPerkembanganPageState
           SizedBox(
             height: 40,
           ),
-          CardCatatan(number: 1, body: content(), title: "Aku"),
-          SizedBox(
-            height: 15,
-          ),
-          CardCatatan(number: 1, body: content(), title: "Panca Indra"),
-          SizedBox(
-            height: 15,
-          ),
-          CardCatatan(number: 1, body: content(), title: "Anggota Tubuh"),
-          SizedBox(
-            height: 15,
-          ),
-          CardCatatan(number: 1, body: content(), title: "Hobi"),
-          SizedBox(
-            height: 15,
-          ),
+          Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('kelas')
+                      .doc(widget.siswa.idKelas)
+                      .collection('anak')
+                      .doc(widget.siswa.id)
+                      .collection('laporanPerkembangan')
+                      .doc(widget.temaId)
+                      .collection('detailLaporan')
+                      .orderBy('createdAt', descending: false)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final docs = snapshot.data?.docs ?? [];
+                    if (docs.isEmpty) {
+                      return const Center(
+                          child: Text('Belum ada detail laporan'));
+                    }
+
+                    return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        itemCount: docs.length,
+                        itemBuilder: (context, index) {
+                          final data =
+                              docs[index].data() as Map<String, dynamic>;
+                          final detail = DetailLaporan.fromMap(data);
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: CardCatatan(
+                              number: index + 1,
+                              title: detail.judul,
+                              body: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Catatan:",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(detail.catatan),
+                                ],
+                              ),
+                              onTap: isTeacher
+                                  ? () {
+                                      _showTambahEditPerkembangan(
+                                          context, detail);
+                                    }
+                                  : null,
+                              onLongPress: isTeacher
+                                  ? () {
+                                      showDeleteDetailLaporanDialog(
+                                          context, detail.id);
+                                    }
+                                  : null,
+                            ),
+                          );
+                        });
+                  }))
         ],
       ),
       floatingActionButton: isTeacher
           ? FloatingActionButton(
-              onPressed: _showTambahPerkembangan,
+              onPressed: () => _showTambahEditPerkembangan(context, null),
               backgroundColor: Colors.blue,
               child: Icon(Icons.add, color: Colors.white),
               shape: CircleBorder(),

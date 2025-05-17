@@ -3,6 +3,7 @@ import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter/material.dart';
 import "package:littlesteps/pages/Guru/berandaGuruPage.dart";
 import "package:littlesteps/pages/Guru/galeriGuruPage.dart";
+import "package:littlesteps/pages/ProfilSiswa/addRangkumanPenilaianPage.dart";
 import "package:littlesteps/pages/bantuan_page.dart";
 import "package:littlesteps/pages/editprofile_page.dart";
 import "package:littlesteps/pages/login_page.dart";
@@ -171,6 +172,18 @@ class _HomepageGuruState extends State<HomepageGuru> {
               context,
               MaterialPageRoute(
                 builder: (context) => EditProfilePage(role: widget.role),
+              ),
+            );
+          },
+        },
+        {
+          'title': 'Rangkuman Penilaian',
+          'onTap': () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AddRangkumanPenilaianPage(kelasId: widget.kelasId),
               ),
             );
           },
