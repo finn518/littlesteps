@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:littlesteps/pages/Guru/KelasPage.dart';
@@ -11,6 +11,7 @@ import 'package:littlesteps/utils/auth_service.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 import 'package:littlesteps/widgets/custombutton.dart';
 import 'package:littlesteps/widgets/customtextfield.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String role;
@@ -22,8 +23,9 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final authService = AuthService();
-  User? _user;
+  fb_auth.User? _user;
   File? selectedImage;
+  String? fotoPath;
 
   final emailController = TextEditingController();
   final namaController = TextEditingController();
@@ -50,6 +52,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           namaController.text = data['name'] ?? '';
           emailController.text = data['email'] ?? '';
           nomerController.text = data['nomor'] ?? '';
+          fotoPath = data['fotoPath'];
         });
       }
     }
@@ -62,6 +65,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final newNumber = nomerController.text.trim();
     final newSapaan = sapaanController.text.trim();
     final currentEmail = user?.email ?? '';
+    final uploadedImageUrl = await uploadProfileImage();
 
     if (user == null) return;
 
@@ -90,6 +94,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'name': newName,
           'email': newEmail,
           'nomor': newNumber,
+          if (uploadedImageUrl != null) 'fotoPath': uploadedImageUrl,
         });
 
         // Logout dan arahkan ke login page
@@ -108,6 +113,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'sapaan': newSapaan,
           'name': newName,
           'nomor': newNumber,
+          if (uploadedImageUrl != null) 'fotoPath': uploadedImageUrl,
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -262,25 +268,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       backgroundColor: Color(0xff0066FF),
                       child: CircleAvatar(
                         radius: 65,
-                        backgroundImage:
-                            AssetImage("assets/images/Bu_mira.png"),
+                        backgroundImage: selectedImage != null
+                            ? FileImage(selectedImage!)
+                            : (fotoPath != null
+                                ? (fotoPath!.startsWith('http')
+                                    ? NetworkImage(fotoPath!)
+                                    : FileImage(File(fotoPath!))
+                                        as ImageProvider)
+                                : AssetImage('assets/images/Bu_mira.png')
+                                    as ImageProvider),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        try {
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () async {
+                          debugPrint("IconButton Detected!");
                           await pickImage();
-                        } catch (e) {
-                          print("Error: $e");
-                        }
-                      },
-                      child: CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.transparent,
-                        child: Image.asset(
-                          'assets/icons/Edit_profil.png',
-                          width: 50,
-                          height: 50,
+                        },
+                        child: CircleAvatar(
+                          radius: 22, // Lingkaran luar putih
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 16, // Lingkaran biru muda
+                            backgroundColor: Colors.blue[100],
+                            child: ImageIcon(
+                              AssetImage('assets/icons/edit.png'),
+                              color: Colors.black,
+                              size: 18,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -300,8 +318,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       // Proses gambar yang dipilih
-      print("Gambar dipilih: ${image.path}");
+      setState(() {
+        selectedImage = File(image.path);
+      });
+      debugPrint("Gambar dipilih: ${image.path}");
     }
   }
 
+  Future<String?> uploadProfileImage() async {
+    if (selectedImage == null) return null;
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'profile_images/$fileName.jpg';
+
+    await Supabase.instance.client.storage
+        .from('users')
+        .upload(path, selectedImage!);
+
+    final publicUrl =
+        Supabase.instance.client.storage.from('users').getPublicUrl(path);
+
+    return publicUrl;
+  }
 }

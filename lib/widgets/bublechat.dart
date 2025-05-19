@@ -36,38 +36,49 @@ class BubbleChat extends StatelessWidget {
       crossAxisAlignment: align,
       children: [
         Container(
-          constraints: BoxConstraints(maxWidth: width * 0.8),
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: radius,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.4),
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-          child: imageUrl != null
-              ? ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(10), // Rounded corners for image
-                  child: Image.asset(
-                    imageUrl!,
-                    width: 100,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : Text(
-                  message,
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins'),
+            constraints: BoxConstraints(maxWidth: width * 0.8),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: radius,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.4),
+                  blurRadius: 6,
+                  offset: Offset(0, 3),
                 ),
-        ),
+              ],
+            ),
+            child: Column(
+              children: [
+                if (imageUrl != null)
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(10), // Rounded corners for image
+                    child: Image.network(
+                      imageUrl!,
+                      width: 100,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.broken_image,
+                            size: 100, color: Colors.grey);
+                      },
+                    ),
+                  ),
+                if (message.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      message,
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins'),
+                    ),
+                  ),
+              ],
+            )),
         Padding(
           padding: EdgeInsets.only(
               top: 2, bottom: 8, left: 10, right: isSender ? 10 : 0),
