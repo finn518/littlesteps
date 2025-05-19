@@ -30,6 +30,7 @@ class _KelasPageState extends State<KelasPage> {
   String namaUser = "Memuat...";
   List<Kelas> daftarKelas = [];
   File? selectedImage;
+  String? fotoPath;
 
   @override
   void initState() {
@@ -56,6 +57,14 @@ class _KelasPageState extends State<KelasPage> {
             namaUser = name.isNotEmpty ? name : 'Pengguna';
           }
         });
+      }
+      if (doc.exists && doc.data()!.containsKey('fotoPath')) {
+        final path = doc['fotoPath'];
+        if (path != null && path != '') {
+          setState(() {
+            fotoPath = path;
+          });
+        }
       }
     }
   }
@@ -551,7 +560,7 @@ class _KelasPageState extends State<KelasPage> {
     return Scaffold(
       backgroundColor: Color.lerp(const Color(0xff53B1FD), Colors.white, 0.9),
       appBar: CustomAppbar(role: widget.role),
-      drawer: CustomDrawer(namaUser: namaUser, menuItems: [
+      drawer: CustomDrawer(fotoPath: fotoPath, namaUser: namaUser, menuItems: [
         {
           'title': 'Profil',
           'onTap': () {
@@ -568,7 +577,11 @@ class _KelasPageState extends State<KelasPage> {
           'onTap': () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => BantuanPage()),
+              MaterialPageRoute(
+                  builder: (context) => BantuanPage(
+                        isGuru: true,
+                        role: widget.role,
+                      )),
             );
           },
         },

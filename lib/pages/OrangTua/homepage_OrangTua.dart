@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePageOrangTua> {
   String namaUser = "pengguna";
   Anak? anak;
   String kelasId = "";
+  String? fotoPath;
   late List<Widget> pages;
   int _selectedIndex = 0;
 
@@ -77,6 +78,14 @@ class _HomePageState extends State<HomePageOrangTua> {
               ? '$sapaan $name'
               : (name.isNotEmpty ? name : 'Pengguna');
         });
+      }
+      if (doc.exists && doc.data()!.containsKey('fotoPath')) {
+        final path = doc['fotoPath'];
+        if (path != null && path != '') {
+          setState(() {
+            fotoPath = path;
+          });
+        }
       }
     }
   }
@@ -167,6 +176,7 @@ class _HomePageState extends State<HomePageOrangTua> {
       appBar: CustomAppbar(role: widget.role),
       drawer: CustomDrawer(
         namaUser: namaUser,
+        fotoPath: fotoPath,
         menuItems: [
           {
             'title': 'Profil',
@@ -207,7 +217,10 @@ class _HomePageState extends State<HomePageOrangTua> {
             'onTap': () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BantuanPage()),
+                MaterialPageRoute(
+                    builder: (context) => BantuanPage(
+                          role: widget.role,
+                        )),
               );
             }
           },

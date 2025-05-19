@@ -28,6 +28,7 @@ class _HomepageGuruState extends State<HomepageGuru> {
   String namaUser = "Memuat...";
   late List<Widget> pages;
   int _selectedIndex = 0;
+  String? fotoPath;
 
   @override
   void initState() {
@@ -64,6 +65,14 @@ class _HomepageGuruState extends State<HomepageGuru> {
             namaUser = name.isNotEmpty ? name : 'Pengguna';
           }
         });
+      }
+      if (doc.exists && doc.data()!.containsKey('fotoPath')) {
+        final path = doc['fotoPath'];
+        if (path != null && path != '') {
+          setState(() {
+            fotoPath = path;
+          });
+        }
       }
     }
   }
@@ -164,7 +173,7 @@ class _HomepageGuruState extends State<HomepageGuru> {
     return Scaffold(
       backgroundColor: Color.lerp(const Color(0xff53B1FD), Colors.white, 0.9),
       appBar: CustomAppbar(role: widget.role),
-      drawer: CustomDrawer(namaUser: namaUser, menuItems: [
+      drawer: CustomDrawer(fotoPath: fotoPath, namaUser: namaUser, menuItems: [
         {
           'title': 'Profil',
           'onTap': () {
@@ -193,7 +202,11 @@ class _HomepageGuruState extends State<HomepageGuru> {
           'onTap': () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => BantuanPage()),
+              MaterialPageRoute(
+                  builder: (context) => BantuanPage(
+                        role: widget.role,
+                        isGuru: true,
+                      )),
             );
           },
         },

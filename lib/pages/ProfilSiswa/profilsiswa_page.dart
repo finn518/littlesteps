@@ -342,16 +342,6 @@ class _ProfilSiswaPageState extends State<ProfilSiswaPage> {
             )),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            padding: const EdgeInsets.only(right: 15),
-            onPressed: () {},
-            icon: ImageIcon(
-              AssetImage('assets/icons/download.png'),
-              size: 30,
-            ),
-          )
-        ],
       ),
       extendBodyBehindAppBar: true,
       body: AppBackground(

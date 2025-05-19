@@ -88,7 +88,7 @@ class _DetailGaleriPageState extends State<DetailGaleriPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => DonwloadImagePage(
+                            builder: (_) => DownloadImagePage(
                                 url: filePath, date: widget.date)));
                   },
                   child: Stack(

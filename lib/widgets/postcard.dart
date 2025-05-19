@@ -5,6 +5,7 @@ import 'package:littlesteps/utils/device_dimension.dart';
 
 class PostCard extends StatelessWidget {
   final String postId;
+  final String? userPhoto;
   final String userName;
   final String dateUpload;
   final String caption;
@@ -22,6 +23,7 @@ class PostCard extends StatelessWidget {
     required this.filePath,
     required this.likes,
     required this.isGuru,
+    this.userPhoto,
     this.onDelete,
   });
 
@@ -166,8 +168,10 @@ class PostCard extends StatelessWidget {
   Widget _uploader() {
     return Row(
       children: [
-        const CircleAvatar(
-          backgroundImage: AssetImage('assets/images/Bu_cindy.png'),
+        CircleAvatar(
+          backgroundImage: (userPhoto != null && userPhoto!.isNotEmpty)
+              ? NetworkImage(userPhoto!)
+              : const AssetImage('assets/images/Bu_cindy.png') as ImageProvider,
           radius: 20,
         ),
         const SizedBox(width: 12),
@@ -192,6 +196,7 @@ class PostCard extends StatelessWidget {
       ],
     );
   }
+
 
   Widget _mediaWidget(String path) {
     bool isVideo = path.toLowerCase().endsWith('.mp4');

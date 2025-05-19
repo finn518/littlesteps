@@ -189,6 +189,7 @@ class _GaleriGuruPageState extends State<GaleriGuruPage> {
                       final data = doc.data() as Map<String, dynamic>;
                       data['id'] = doc.id;
                       return PostCard(
+                        userPhoto: data['userPhoto'] ?? '',
                         postId: data['id'],
                         userName: data['userName'] ?? 'Anonim',
                         dateUpload: data['dateUpload'] ?? '',

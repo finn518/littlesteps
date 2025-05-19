@@ -88,12 +88,12 @@ class AuthService {
     }
   }
 
-  Future<UserCredential> signInWithGoogle({required String role}) async {
+  Future<String?> signInWithGoogle({required String selectedRole}) async {
     try {
-      if (role.isEmpty) throw Exception('Role tidak boleh kosong');
+      if (selectedRole.isEmpty) return 'Role tidak boleh kosong';
 
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) throw Exception('Login dengan Google dibatalkan');
+      if (googleUser == null) return 'Login dengan Google dibatalkan';
 
       final googleAuth = await googleUser.authentication;
 
@@ -111,23 +111,34 @@ class AuthService {
         final doc = await docRef.get();
 
         if (!doc.exists) {
+          // Jika pengguna baru, daftarkan dengan role yang dipilih
           await docRef.set({
             'email': user.email ?? '',
             'name': user.displayName ?? '',
             'nomer': user.phoneNumber ?? '',
-            'role': role,
+            'role': selectedRole,
             'createdAt': FieldValue.serverTimestamp(),
           });
           debugPrint('Data pengguna baru berhasil disimpan di Firestore');
         } else {
+          // Jika pengguna sudah ada, periksa role-nya
+          String storedRole = doc.get('role') ?? '';
+          print(storedRole);
+          print(selectedRole);
+
+          if (storedRole != selectedRole) {
+            await firebaseAuth.signOut();
+            return 'Akun Tidak terdaftar';
+          }
+
           debugPrint('Pengguna sudah ada di Firestore');
         }
       }
 
-      return userCredential;
+      return null; // Return null jika berhasil
     } catch (e) {
       debugPrint('Error selama signInWithGoogle: $e');
-      rethrow;
+      return 'Terjadi kesalahan saat login dengan Google';
     }
   }
 

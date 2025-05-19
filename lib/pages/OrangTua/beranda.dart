@@ -109,6 +109,7 @@ class _BerandaState extends State<Beranda> {
                 final data = doc.data()! as Map<String, dynamic>;
                 return PostCard(
                   postId: doc.id,
+                  userPhoto: data['userPhoto'] ?? '',
                   userName: data['userName'] ?? 'Anonim',
                   dateUpload: data['dateUpload'],
                   caption: data['caption'] ?? '',

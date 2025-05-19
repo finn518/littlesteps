@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:littlesteps/pages/Guru/KelasPage.dart';
-import 'package:littlesteps/pages/Guru/homepage_Guru.dart';
 import 'package:littlesteps/pages/OrangTua/homepage_OrangTua.dart';
 import 'package:littlesteps/pages/ResetPassword/resetpassword_page.dart';
 import 'package:littlesteps/pages/role_page.dart';
@@ -64,7 +63,18 @@ class _LoginPageState extends State<LoginPage> {
 
   void loginGoogle(String role) async {
     try {
-      await authService.signInWithGoogle(role: role);
+      final errorMessage =
+          await authService.signInWithGoogle(selectedRole: role);
+
+      if (errorMessage != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(errorMessage)));
+        }
+        return; // Keluar dari fungsi jika ada error
+      }
+
+      // Lanjutkan navigasi jika tidak ada error
       if (mounted) {
         if (widget.role == 'Guru') {
           Navigator.pushReplacement(
@@ -85,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("$e")));
+            .showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
       }
     }
   }

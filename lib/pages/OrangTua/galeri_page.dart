@@ -116,7 +116,6 @@ class _GaleriPageState extends State<GaleriPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 50),
             const SizedBox(height: 16),
             const Text(
               'Gagal memuat data galeri',
@@ -125,13 +124,9 @@ class _GaleriPageState extends State<GaleriPage> {
             Text(
               _errorMessage!,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: Colors.black),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _fetchUserData,
-              child: const Text('Coba Lagi'),
-            ),
           ],
         ),
       );

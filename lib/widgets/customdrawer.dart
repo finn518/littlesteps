@@ -1,18 +1,17 @@
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 
 class CustomDrawer extends StatefulWidget {
   final String namaUser;
+  final String? fotoPath;
   final List<Map<String, dynamic>> menuItems;
 
   CustomDrawer({
     super.key,
     required this.namaUser,
     required this.menuItems,
+      this.fotoPath
   });
 
   @override
@@ -20,38 +19,11 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  String? fotoPath;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchFotoPath();
-  }
-
-  void fetchFotoPath() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      if (doc.exists && doc.data()!.containsKey('fotoPath')) {
-        final path = doc['fotoPath'];
-        if (path != null && path != '') {
-          setState(() {
-            fotoPath = path;
-          });
-        }
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
     final height = DeviceDimensions.height(context);
-
     return Drawer(
       child: ListView(
         children: [
@@ -64,10 +36,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   backgroundColor: Color(0xff53B1FD),
                   radius: 22,
                   child: CircleAvatar(
-                    backgroundImage: fotoPath != null
-                        ? (fotoPath!.startsWith('http')
-                            ? NetworkImage(fotoPath!)
-                            : FileImage(File(fotoPath!)) as ImageProvider)
+                    backgroundImage: widget.fotoPath != null
+                        ? (widget.fotoPath!.startsWith('http')
+                            ? NetworkImage(widget.fotoPath!)
+                            : FileImage(File(widget.fotoPath!))
+                                as ImageProvider)
                         : AssetImage('assets/images/Bu_mira.png')
                             as ImageProvider,
                     radius: 20,

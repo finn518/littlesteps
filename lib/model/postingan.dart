@@ -7,7 +7,7 @@ class Postingan {
   final String caption;
   final String filePath;
   final int likes;
-  //final String userPhoto
+  final String userPhoto;
 
   Postingan({
     required this.id,
@@ -16,7 +16,7 @@ class Postingan {
     required this.caption,
     required this.filePath,
     required this.likes,
-    //required this.userPhoto
+      required this.userPhoto
   });
 
   // Factory method untuk membuat instance dari Firestore document
@@ -29,7 +29,7 @@ class Postingan {
       caption: data['caption'] ?? '',
       filePath: data['filePath'] ?? '',
       likes: data['likes'] ?? '',
-      //userPhoto: data['userPhoto'] ?? '',
+      userPhoto: data['userPhoto'] ?? '',
 
     );
   }
@@ -43,7 +43,7 @@ class Postingan {
       'caption': caption,
       'filePath': filePath,
       'likes': likes,
-      // 'userPhoto': userPhoto,
+      'userPhoto': userPhoto,
     };
   }
 }

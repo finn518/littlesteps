@@ -111,7 +111,6 @@ class _UploadGaleriState extends State<UploadGaleri> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.kelasId);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -255,6 +254,7 @@ class _UploadGaleriState extends State<UploadGaleri> {
 
                       final userName =
                           "${userData['sapaan']} ${userData['name']}";
+                      final userPhoto = userData['fotoPath'] ?? '';
 
                       // 📅 Format tanggal
                       final formattedDate = DateFormat('dd MMMM yyyy', 'id_ID')
@@ -267,7 +267,7 @@ class _UploadGaleriState extends State<UploadGaleri> {
                           .collection('postingan')
                           .doc();
 
-                      await postinganRef.set({
+                      final postData = {
                         'id': postinganRef.id,
                         'userName': userName,
                         'dateUpload': formattedDate,
@@ -276,7 +276,17 @@ class _UploadGaleriState extends State<UploadGaleri> {
                         'likes': 0,
                         'createdAt': Timestamp.now(),
                         'userId': user.uid,
-                      });
+                      };
+
+                      // ✅ Tambahkan userPhoto hanya jika tersedia
+                      if (userData.containsKey('fotoPath') &&
+                          userData['fotoPath'] != null &&
+                          userData['fotoPath'].toString().isNotEmpty) {
+                        postData['userPhoto'] = userData['fotoPath'];
+                      }
+
+                      // 🔥 Simpan ke Firestore
+                      await postinganRef.set(postData);
 
                       // 🔄 Reset form
                       setState(() {
