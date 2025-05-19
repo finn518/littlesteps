@@ -3,7 +3,9 @@ import 'package:littlesteps/pages/roomchat_page.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 
 class PesanPage extends StatelessWidget {
-  const PesanPage({super.key});
+  final String role;
+  final String kelasId;
+  const PesanPage({super.key, required this.role, required this.kelasId});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,8 @@ class PesanPage extends StatelessWidget {
           MaterialPageRoute(
               builder: (context) => RoomChatPage(
                     isAnounce: false,
-                    chats: chatPribadi,
+                    kelasId: kelasId,
+                    role: role,
                   )));
     }
 
@@ -84,10 +87,9 @@ class PesanPage extends StatelessWidget {
                     borderSide: BorderSide.none,
                   ),
                   prefixIcon: IconButton(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    onPressed: () {},
-                    icon: ImageIcon(AssetImage('assets/icons/Cari.png'))
-                  ),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      onPressed: () {},
+                      icon: ImageIcon(AssetImage('assets/icons/Cari.png'))),
                 ),
               ),
             ),
@@ -100,7 +102,10 @@ class PesanPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => RoomChatPage(
-                              isAnounce: true, chats: chatPengumuman)));
+                                isAnounce: true,
+                                kelasId: kelasId,
+                                role: role,
+                              )));
                 },
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -113,7 +118,10 @@ class PesanPage extends StatelessWidget {
                     padding: const EdgeInsets.all(15),
                     child: Row(
                       children: [
-                        ImageIcon(AssetImage('assets/icons/Pengumuman.png'), size: 36,),
+                        ImageIcon(
+                          AssetImage('assets/icons/Pengumuman.png'),
+                          size: 36,
+                        ),
                         SizedBox(width: 20),
                         Text(
                           "Pengumuman",
@@ -126,8 +134,7 @@ class PesanPage extends StatelessWidget {
                   ),
                 ),
               ),
-              bubblePesan(
-                  "Bu Rani", "walaikumsalam", "kemarin",
+              bubblePesan("Bu Rani", "walaikumsalam", "kemarin",
                   () => tochatpribadi(), "assets/images/Bu_cindy.png", context),
               bubblePesan("Bu Sinta", "betul bu anak saya juga", "10:00",
                   () => tochatpribadi(), "assets/images/Bu_mira.png", context),
@@ -140,8 +147,7 @@ class PesanPage extends StatelessWidget {
     );
   }
 
-  Widget bubblePesan(
-      String name, String pesan, String waktu,
+  Widget bubblePesan(String name, String pesan, String waktu,
       VoidCallback onTap, String imagePath, BuildContext context) {
     final width = DeviceDimensions.width(context);
     return GestureDetector(
@@ -159,8 +165,8 @@ class PesanPage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundImage: AssetImage(
-                    imagePath), // Pastikan gambar ada di path ini
+                backgroundImage:
+                    AssetImage(imagePath), // Pastikan gambar ada di path ini
               ),
               SizedBox(width: 15),
               Expanded(

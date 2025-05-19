@@ -400,20 +400,21 @@ class _KelasPageState extends State<KelasPage> {
                     Positioned(
                       bottom: -20,
                       right: 16,
-                      child: CircleAvatar(
-                        radius: 22, // Lingkaran putih (luar)
-                        backgroundColor: Colors.white,
+                      child: GestureDetector(
+                        onTap: () {
+                          showTambahEditKelasForm(context, kelas: kelas);
+                        },
                         child: CircleAvatar(
-                          radius: 16, // Lingkaran biru muda (dalam)
-                          backgroundColor: Colors.blue[100],
-                          child: IconButton(
-                            icon: ImageIcon(
+                          radius: 22, // Lingkaran putih (luar)
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 16, // Lingkaran biru muda (dalam)
+                            backgroundColor: Colors.blue[100],
+                            child: ImageIcon(
                               AssetImage('assets/icons/edit.png'),
                               color: Colors.black,
+                              size: 20,
                             ),
-                            onPressed: () {
-                              showTambahEditKelasForm(context, kelas: kelas);
-                            },
                           ),
                         ),
                       ),

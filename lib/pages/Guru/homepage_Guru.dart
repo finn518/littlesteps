@@ -35,7 +35,7 @@ class _HomepageGuruState extends State<HomepageGuru> {
     pages = [
       BerandaGuru(kelasId: widget.kelasId, role: widget.role),
       GaleriGuruPage(kelasId: widget.kelasId),
-      PesanPage(),
+      PesanPage(kelasId: widget.kelasId, role: widget.role),
     ];
     _loadUserData();
   }

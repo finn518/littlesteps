@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePageOrangTua> {
   String namaUser = "pengguna";
   Anak? anak;
   String kelasId = "";
-  List<Widget> pages = [Beranda(), GaleriPage(), PesanPage()];
+  late List<Widget> pages;
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -52,6 +52,11 @@ class _HomePageState extends State<HomePageOrangTua> {
   @override
   void initState() {
     super.initState();
+    pages = [
+      Beranda(),
+      GaleriPage(),
+      PesanPage(role: widget.role, kelasId: ""),
+    ];
     _loadUserData();
     _checkConnected(); // Memastikan data anak dimuat
   }
@@ -104,9 +109,28 @@ class _HomePageState extends State<HomePageOrangTua> {
             setState(() {
               anak = Anak.fromMap(anakData);
               kelasId = data['kelasId'] ?? '';
+
+              pages = [
+                Beranda(),
+                GaleriPage(),
+                PesanPage(
+                  role: widget.role,
+                  kelasId: kelasId,
+                )
+              ];
             });
           }
         } else {
+          setState(() {
+            pages = [
+              Beranda(),
+              GaleriPage(),
+              PesanPage(
+                role: widget.role,
+                kelasId: "", // kelasId kosong jika belum terhubung
+              )
+            ];
+          });
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Data anak tidak ditemukan.")),
@@ -303,6 +327,4 @@ class _HomePageState extends State<HomePageOrangTua> {
       },
     );
   }
-
-
 }
