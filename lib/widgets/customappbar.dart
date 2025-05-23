@@ -77,7 +77,7 @@ class _CustomAppbarState extends State<CustomAppbar> {
                 ),
                 const ImageIcon(
                   AssetImage(
-                    'assets/icons/Sidebar.png',
+                    'assets/icons/sidebar.png',
                   ),
                   size: 35,
                 )
