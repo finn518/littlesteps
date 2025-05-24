@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
+import 'package:littlesteps/utils/encryption_helper.dart';
 import 'package:littlesteps/widgets/bublechat.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -33,6 +33,20 @@ class _RoomChatPageState extends State<RoomChatPage> {
   final String? userId = fb_auth.FirebaseAuth.instance.currentUser?.uid;
   File? selectedImage;
   bool isSending = false;
+
+  String _handleMessage(dynamic message) {
+    if (message == null) return '';
+
+    try {
+      if (EncryptionHelper.isEncrypted(message)) {
+        return EncryptionHelper.decryptText(message as String);
+      }
+      return message.toString();
+    } catch (e) {
+      debugPrint('Error decrypting message: $e');
+      return message.toString(); // Fallback ke pesan asli
+    }
+  }
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
@@ -66,6 +80,9 @@ class _RoomChatPageState extends State<RoomChatPage> {
 
     if (text.isEmpty && filePath == null) return;
 
+    final encryptedText =
+        text.isNotEmpty ? EncryptionHelper.encryptText(text) : null;
+
     final docRef = firestore
         .collection('kelas')
         .doc(widget.kelasId)
@@ -75,7 +92,7 @@ class _RoomChatPageState extends State<RoomChatPage> {
     await docRef.set({
       'id': docRef.id,
       'kelasId': widget.kelasId,
-      'isiPesan': text,
+      'isiPesan': encryptedText,
       'filePath': filePath,
       'pengirimId': userId,
       'timestamp': FieldValue.serverTimestamp(),
@@ -97,6 +114,9 @@ class _RoomChatPageState extends State<RoomChatPage> {
     final filePath = await uploadImages();
     if (text.isEmpty && filePath == null) return;
 
+    final encryptedText =
+        text.isNotEmpty ? EncryptionHelper.encryptText(text) : null;
+
     final penerimaId = widget.user?['uid'];
     final senderId = userId!;
     final chatRoomId = getChatRoomId(senderId, penerimaId!);
@@ -111,7 +131,7 @@ class _RoomChatPageState extends State<RoomChatPage> {
 
     await docRef.set({
       'id': docRef.id,
-      'isiPesan': text,
+      'isiPesan': encryptedText,
       'filePath': filePath,
       'pengirimId': senderId,
       'penerimaId': penerimaId,
@@ -409,7 +429,7 @@ class _RoomChatPageState extends State<RoomChatPage> {
                                 ),
                               ),
                             BubbleChat(
-                              message: data['isiPesan'] ?? '',
+                              message: _handleMessage(data['isiPesan']),
                               isSender: isMe,
                               imageUrl: data['filePath'],
                               time:
@@ -518,4 +538,6 @@ class _RoomChatPageState extends State<RoomChatPage> {
       ]),
     );
   }
+  
+  
 }
