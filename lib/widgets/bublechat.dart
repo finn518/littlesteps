@@ -6,14 +6,16 @@ class BubbleChat extends StatelessWidget {
   final bool isSender;
   final String? imageUrl;
   final String time;
+  final VoidCallback? onLongPress;
 
-  const BubbleChat({
-    Key? key,
-    required this.message,
-    required this.isSender,
-    this.imageUrl,
-    required this.time,
-  }) : super(key: key);
+  const BubbleChat(
+      {Key? key,
+      required this.message,
+      required this.isSender,
+      this.imageUrl,
+      required this.time,
+      this.onLongPress})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,9 @@ class BubbleChat extends StatelessWidget {
     return Column(
       crossAxisAlignment: align,
       children: [
-        Container(
+        GestureDetector(
+          onLongPress: onLongPress,
+          child: Container(
             constraints: BoxConstraints(maxWidth: width * 0.8),
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -78,7 +82,9 @@ class BubbleChat extends StatelessWidget {
                     ),
                   ),
               ],
-            )),
+            ),
+          ),
+        ),
         Padding(
           padding: EdgeInsets.only(
               top: 2, bottom: 8, left: 10, right: isSender ? 10 : 0),

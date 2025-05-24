@@ -1,157 +1,469 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:littlesteps/pages/roomchat_page.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 
-class PesanPage extends StatelessWidget {
+class PesanPage extends StatefulWidget {
   final String role;
   final String kelasId;
   const PesanPage({super.key, required this.role, required this.kelasId});
+
+  @override
+  State<PesanPage> createState() => _PesanPageState();
+}
+
+class _PesanPageState extends State<PesanPage> {
+  final firestore = FirebaseFirestore.instance;
+  final auth = FirebaseAuth.instance;
+  late String currentUserId;
+  TextEditingController _searchController = TextEditingController();
+  String searchText = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    currentUserId = auth.currentUser!.uid;
+  }
+
+  void _navigateToRoomChat(
+      {required bool isAnounce, required Map<String, dynamic>? penerima}) {
+    if (isAnounce) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RoomChatPage(
+            isAnounce: true,
+            kelasId: widget.kelasId,
+            role: widget.role,
+          ),
+        ),
+      );
+    } else {
+      if (penerima != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RoomChatPage(
+              isAnounce: false,
+              kelasId: widget.kelasId,
+              role: widget.role,
+              user: penerima,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void _showSelectReceiverDialog() async {
+    final List<Map<String, dynamic>> semuaUserData = [];
+    final guruSnapshot = await firestore
+        .collection('users')
+        .where('role', isEqualTo: 'Guru')
+        .get();
+    semuaUserData.addAll(guruSnapshot.docs.map((doc) {
+      final data = doc.data();
+      data['uid'] = doc.id;
+      return data;
+    }));
+
+    // Kalo yg ngirim Orang Tua atau Guru, jadinya ada orang tua dari kelas yang sama
+    if (widget.role == "Orang Tua" || widget.role == 'Guru') {
+      final ortuSnapshot = await firestore
+          .collection('users')
+          .where('role', isEqualTo: 'Orang Tua')
+          .where('kelasId', isEqualTo: widget.kelasId)
+          .get();
+      semuaUserData.addAll(ortuSnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['uid'] = doc.id;
+        return data;
+      }));
+    }
+
+    final filteredUsers =
+        semuaUserData.where((u) => u['uid'] != currentUserId).toList();
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Pilih Penerima',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...filteredUsers.map((userMap) {
+                final fotoPath =
+                    userMap['fotoPath'] ?? 'assets/images/default.png';
+                final imageProvider = fotoPath.startsWith('http')
+                    ? NetworkImage(fotoPath)
+                    : AssetImage(fotoPath) as ImageProvider;
+
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: imageProvider,
+                    radius: 24,
+                  ),
+                  title: Text(
+                    '${userMap['sapaan']} ${userMap['name']}',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(
+                    userMap['role'] ?? 'No Role',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateToRoomChat(
+                      isAnounce: false,
+                      penerima: userMap,
+                    );
+                  },
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  bool isUserInRoomId(String roomId, String uid) {
+    final parts = roomId.split('_');
+    return parts.contains(uid);
+  }
+
+  void showDeleteChatDialog(
+      BuildContext context, String kelasId, String roomId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Apakah Anda yakin ingin menghapus chat ini beserta seluruh isinya?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Tombol Ya
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff0066FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await deleteChatRoom(kelasId, roomId);
+                    },
+                    child: const Text("Ya",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            fontSize: 18)),
+                  ),
+                  const SizedBox(width: 16),
+                  // Tombol Tidak
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.black),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                    ),
+                    onPressed: () => Navigator.pop(context), // Tutup dialog
+                    child: const Text("Tidak",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xff0066FF),
+                            fontSize: 18)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> deleteChatRoom(String kelasId, String roomId) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      final pesanCollection = firestore
+          .collection('kelas')
+          .doc(kelasId)
+          .collection('chatPribadi')
+          .doc(roomId)
+          .collection('pesan');
+
+      final pesanSnapshot = await pesanCollection.get();
+      final batch = firestore.batch();
+
+      for (final doc in pesanSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      final roomDocRef = firestore
+          .collection('kelas')
+          .doc(kelasId)
+          .collection('chatPribadi')
+          .doc(roomId);
+      batch.delete(roomDocRef);
+
+      await batch.commit();
+
+      debugPrint("Chat room dan seluruh pesannya berhasil dihapus.");
+    } catch (e) {
+      debugPrint("Gagal menghapus chat room: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
     final height = DeviceDimensions.height(context);
 
-    List<Map<String, dynamic>> chatPengumuman = [
-      {
-        'message':
-            'Assalamualaikum ibu dan bapak sekalian, informasi untuk besok dalam rangka menyambut 17 agustus',
-        'isSender': false,
-        'time': '10:12',
-      },
-      {
-        'message': '',
-        'isSender': false,
-        'imageUrl': 'assets/images/bendera.png',
-        'time': '10:13',
-      },
-      {
-        'message':
-            'Diharapkan anak-anak membawa bendera merah putih seperti pada gambar. Terimakasih atas perhatiannya.',
-        'isSender': false,
-        'time': '10:14',
-      },
-    ];
-
-    List<Map<String, dynamic>> chatPribadi = [
-      {
-        'message':
-            'Assalamualaikum bu mira, hari ini Aisyah semangat sekali. Dia berani angkat tangan dan jawab pertanyaan lho!',
-        'isSender': false,
-        'time': '09:12',
-      },
-      {
-        'message':
-            'waalaikumsalam bu rani. Wah, senangnya dengar itu Bu. Di rumah juga lagi sering cerita soal sekolah',
-        'isSender': true,
-        'time': '10:13',
-      },
-    ];
-
-    void tochatpribadi() {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => RoomChatPage(
-                    isAnounce: false,
-                    kelasId: kelasId,
-                    role: role,
-                  )));
-    }
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: width * 0.06, vertical: height * 0.04),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              width: double.infinity,
-              height: width * 0.12,
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon: IconButton(
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Search bar
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: width * 0.06, vertical: height * 0.04),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                width: double.infinity,
+                height: width * 0.12,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchText = value.toLowerCase();
+                    });
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: IconButton(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       onPressed: () {},
-                      icon: ImageIcon(AssetImage('assets/icons/Cari.png'))),
-                ),
-              ),
-            ),
-          ),
-          Column(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RoomChatPage(
-                                isAnounce: true,
-                                kelasId: kelasId,
-                                role: role,
-                              )));
-                },
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  color: Color(0xFFFEF9E4),
-                  margin: EdgeInsets.symmetric(
-                      horizontal: width * 0.04, vertical: 5),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Row(
-                      children: [
-                        ImageIcon(
-                          AssetImage('assets/icons/Pengumuman.png'),
-                          size: 36,
-                        ),
-                        SizedBox(width: 20),
-                        Text(
-                          "Pengumuman",
-                          style: TextStyle(
-                              fontVariations: [FontVariation('wght', 800)],
-                              fontSize: 18),
-                        ),
-                      ],
+                      icon: ImageIcon(AssetImage('assets/icons/Cari.png')),
                     ),
                   ),
                 ),
               ),
-              bubblePesan("Bu Rani", "walaikumsalam", "kemarin",
-                  () => tochatpribadi(), "assets/images/Bu_cindy.png", context),
-              bubblePesan("Bu Sinta", "betul bu anak saya juga", "10:00",
-                  () => tochatpribadi(), "assets/images/Bu_mira.png", context),
-              bubblePesan("Bu Cindy", "iya bu", "11:30", () => tochatpribadi(),
-                  "assets/images/Bu_rani.png", context),
-            ],
-          ),
-        ],
+            ),
+
+            // Pengumuman
+            GestureDetector(
+              onTap: () => _navigateToRoomChat(isAnounce: true, penerima: null),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                color: Color(0xFFFEF9E4),
+                margin:
+                    EdgeInsets.symmetric(horizontal: width * 0.04, vertical: 5),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Row(
+                    children: [
+                      ImageIcon(AssetImage('assets/icons/Pengumuman.png'),
+                          size: 36),
+                      SizedBox(width: 20),
+                      Text("Pengumuman",
+                          style: TextStyle(
+                              fontVariations: [FontVariation('wght', 800)],
+                              fontSize: 18)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Ini kalo chat udh pernah ada
+            StreamBuilder<QuerySnapshot>(
+              stream: firestore
+                  .collection('kelas')
+                  .doc(widget.kelasId)
+                  .collection('chatPribadi')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return SizedBox();
+
+                final docs = snapshot.data!.docs.where((doc) {
+                  final parts = doc.id.split('_');
+                  return parts.contains(currentUserId);
+                });
+                final seen = <String>{};
+                final uniqueDocs = <QueryDocumentSnapshot>[];
+
+                for (var doc in docs) {
+                  final parts = doc.id.split('_')..sort();
+                  final roomKey = parts.join('_');
+
+                  if (!seen.contains(roomKey)) {
+                    seen.add(roomKey);
+                    uniqueDocs.add(doc);
+                  }
+                }
+
+                return FutureBuilder<List<Map<String, dynamic>>>(
+                  future: Future.wait(uniqueDocs.map((doc) async {
+                    final roomId = doc.id;
+                    final parts = roomId.split('_');
+                    final partnerId =
+                        parts.firstWhere((id) => id != currentUserId);
+
+                    final userSnap = await firestore
+                        .collection('users')
+                        .doc(partnerId)
+                        .get();
+                    final userData = userSnap.data() ?? {};
+                    userData['uid'] = userSnap.id;
+
+                    final pesanSnap = await firestore
+                        .collection('kelas')
+                        .doc(widget.kelasId)
+                        .collection('chatPribadi')
+                        .doc(roomId)
+                        .collection('pesan')
+                        .orderBy('timestamp', descending: true)
+                        .limit(1)
+                        .get();
+
+                    final isiPesan = pesanSnap.docs.isNotEmpty
+                        ? pesanSnap.docs.first.data()
+                        : null;
+
+                    return {
+                      'user': userData,
+                      'roomId': roomId,
+                      'lastMessage': isiPesan?['isiPesan'] ?? '',
+                      'lastTimestamp': isiPesan?['timestamp'],
+                    };
+                  })),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) return SizedBox();
+
+                    final sortedRooms = snapshot.data!;
+                    sortedRooms.sort((a, b) {
+                      final aTime = a['lastTimestamp'] as Timestamp?;
+                      final bTime = b['lastTimestamp'] as Timestamp?;
+                      if (aTime == null && bTime == null) return 0;
+                      if (aTime == null) return 1;
+                      if (bTime == null) return -1;
+                      return bTime.compareTo(aTime);
+                    });
+
+                    return Column(
+                      children: sortedRooms.map((data) {
+                        final user = data['user'];
+                        final time =
+                            (data['lastTimestamp'] as Timestamp?)?.toDate();
+                        final formattedTime = time != null
+                            ? DateFormat('HH:mm').format(time)
+                            : '';
+
+                        return bubblePesan(
+                            '${user['sapaan']} ${user['name']}',
+                            data['lastMessage'] ?? '',
+                            formattedTime,
+                            () => _navigateToRoomChat(
+                                  isAnounce: false,
+                                  penerima: user,
+                                ),
+                            user['fotoPath'] ?? 'assets/images/Bu_rani.png',
+                            context, onLongPress: () {
+                          showDeleteChatDialog(
+                              context, widget.kelasId, data['roomId']);
+                        });
+                      }).toList(),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        shape: const CircleBorder(),
+        onPressed: _showSelectReceiverDialog,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  Widget bubblePesan(String name, String pesan, String waktu,
-      VoidCallback onTap, String imagePath, BuildContext context) {
+  Widget bubblePesan(
+    String name,
+    String pesan,
+    String waktu,
+    VoidCallback onTap,
+    String imagePath,
+    BuildContext context, {
+    VoidCallback? onLongPress,
+  }) {
     final width = DeviceDimensions.width(context);
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -165,8 +477,10 @@ class PesanPage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundImage:
-                    AssetImage(imagePath), // Pastikan gambar ada di path ini
+                backgroundImage: imagePath.startsWith('http')
+                    ? NetworkImage(imagePath)
+                    : AssetImage(imagePath)
+                        as ImageProvider, // Pastikan gambar ada di path ini
               ),
               SizedBox(width: 15),
               Expanded(
