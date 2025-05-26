@@ -1,5 +1,6 @@
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
+// import "package:firebase_messaging/firebase_messaging.dart";
 import "package:flutter/material.dart";
 import "package:littlesteps/model/anak.dart";
 import "package:littlesteps/pages/OrangTua/beranda.dart";
@@ -60,6 +61,7 @@ class _HomePageState extends State<HomePageOrangTua> {
     ];
     _loadUserData();
     _checkConnected(); // Memastikan data anak dimuat
+    // saveFCM();
   }
 
   void _loadUserData() async {
@@ -169,6 +171,25 @@ class _HomePageState extends State<HomePageOrangTua> {
       'kelasId': FieldValue.delete(),
     });
   }
+
+  // Future<void> saveFCM() async {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     final token = await FirebaseMessaging.instance.getToken();
+  //     if (token != null) {
+  //       await FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(user.uid)
+  //           .update({
+  //         'fcmToken': token,
+  //       });
+  //       print("FCM token berhasil disimpan");
+  //     } else {
+  //       print("FCM token tidak tersedia");
+  //     }
+  //   }
+  // }
+
 
   @override
   Widget build(BuildContext context) {

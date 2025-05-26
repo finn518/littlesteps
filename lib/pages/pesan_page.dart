@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:littlesteps/pages/roomchat_page.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
+import 'package:littlesteps/utils/encryption_helper.dart';
 
 class PesanPage extends StatefulWidget {
   final String role;
@@ -20,6 +22,7 @@ class _PesanPageState extends State<PesanPage> {
   late String currentUserId;
   final TextEditingController _searchController = TextEditingController();
   String searchText = '';
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -28,6 +31,26 @@ class _PesanPageState extends State<PesanPage> {
     currentUserId = auth.currentUser!.uid;
   }
 
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  String _handleMessage(dynamic message) {
+    if (message == null) return '';
+
+    try {
+      if (EncryptionHelper.isEncrypted(message)) {
+        return EncryptionHelper.decryptText(message as String);
+      }
+      return message.toString();
+    } catch (e) {
+      debugPrint('Error decrypting message: $e');
+      return message.toString(); // Fallback ke pesan asli
+    }
+  }
   void _navigateToRoomChat(
       {required bool isAnounce, required Map<String, dynamic>? penerima}) {
     if (isAnounce) {
@@ -109,7 +132,7 @@ class _PesanPageState extends State<PesanPage> {
               const SizedBox(height: 12),
               ...filteredUsers.map((userMap) {
                 final fotoPath =
-                    userMap['fotoPath'] ?? 'assets/images/default.png';
+                    userMap['fotoPath'] ?? 'assets/images/Bu_cindy.png';
                 final imageProvider = fotoPath.startsWith('http')
                     ? NetworkImage(fotoPath)
                     : AssetImage(fotoPath) as ImageProvider;
@@ -120,7 +143,7 @@ class _PesanPageState extends State<PesanPage> {
                     radius: 24,
                   ),
                   title: Text(
-                    '${userMap['sapaan']} ${userMap['name']}',
+                    '${userMap['sapaan'] != null && userMap['sapaan'].toString().isNotEmpty ? '${userMap['sapaan']} ' : ''}${userMap['name']}',
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
@@ -128,6 +151,7 @@ class _PesanPageState extends State<PesanPage> {
                       color: Colors.black87,
                     ),
                   ),
+
                   subtitle: Text(
                     userMap['role'] ?? 'No Role',
                     style: const TextStyle(
@@ -259,6 +283,37 @@ class _PesanPageState extends State<PesanPage> {
     }
   }
 
+  void _onSearchChanged(String value) {
+    if (_searchDebounce?.isActive ?? false) _searchDebounce?.cancel();
+
+    _searchDebounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        searchText = value.toLowerCase();
+      });
+    });
+  }
+
+  List<Map<String, dynamic>> _filterChatRooms(
+      List<Map<String, dynamic>> rooms, String searchQuery) {
+    if (searchQuery.isEmpty) return rooms;
+
+    return rooms.where((room) {
+      final user = room['user'] as Map<String, dynamic>;
+      final name = '${user['sapaan']} ${user['name']}'.toLowerCase();
+
+      // Gabungkan semua pesan dalam room
+      final allMessages = room['messages'] as List;
+      final messageTexts = allMessages
+          .map((msg) => _handleMessage(msg['isiPesan']).toLowerCase())
+          .toList();
+
+      // Cek apakah nama atau pesan mengandung searchQuery
+      return name.contains(searchQuery) ||
+          messageTexts.any((text) => text.contains(searchQuery));
+    }).toList();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final width = DeviceDimensions.width(context);
@@ -287,11 +342,7 @@ class _PesanPageState extends State<PesanPage> {
                 height: width * 0.12,
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      searchText = value.toLowerCase();
-                    });
-                  },
+                  onChanged: _onSearchChanged,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -301,9 +352,15 @@ class _PesanPageState extends State<PesanPage> {
                     ),
                     prefixIcon: IconButton(
                       padding: EdgeInsets.symmetric(horizontal: 20),
-                      onPressed: () {},
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {
+                          searchText = '';
+                        });
+                      },
                       icon: ImageIcon(AssetImage('assets/icons/Cari.png')),
                     ),
+                    hintText: 'Cari percakapan...',
                   ),
                 ),
               ),
@@ -349,6 +406,7 @@ class _PesanPageState extends State<PesanPage> {
                   final parts = doc.id.split('_');
                   return parts.contains(currentUserId);
                 });
+
                 final seen = <String>{};
                 final uniqueDocs = <QueryDocumentSnapshot>[];
 
@@ -376,25 +434,29 @@ class _PesanPageState extends State<PesanPage> {
                     final userData = userSnap.data() ?? {};
                     userData['uid'] = userSnap.id;
 
+                    // Ambil semua pesan di dalam room
                     final pesanSnap = await firestore
                         .collection('kelas')
                         .doc(widget.kelasId)
                         .collection('chatPribadi')
                         .doc(roomId)
                         .collection('pesan')
-                        .orderBy('timestamp', descending: true)
-                        .limit(1)
+                        .orderBy('timestamp')
                         .get();
 
-                    final isiPesan = pesanSnap.docs.isNotEmpty
-                        ? pesanSnap.docs.first.data()
+                    final messages =
+                        pesanSnap.docs.map((doc) => doc.data()).toList();
+
+                    // Ambil timestamp pesan terakhir
+                    final lastTimestamp = pesanSnap.docs.isNotEmpty
+                        ? pesanSnap.docs.last['timestamp']
                         : null;
 
                     return {
                       'user': userData,
                       'roomId': roomId,
-                      'lastMessage': isiPesan?['isiPesan'] ?? '',
-                      'lastTimestamp': isiPesan?['timestamp'],
+                      'messages': messages,
+                      'lastTimestamp': lastTimestamp,
                     };
                   })),
                   builder: (context, snapshot) {
@@ -410,34 +472,58 @@ class _PesanPageState extends State<PesanPage> {
                       return bTime.compareTo(aTime);
                     });
 
+                    final filteredRooms =
+                        _filterChatRooms(sortedRooms, searchText);
+
+                    if (filteredRooms.isEmpty && searchText.isNotEmpty) {
+                      return Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text(
+                          'Tidak ditemukan percakapan dengan kata kunci "$searchText"',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    }
+
                     return Column(
-                      children: sortedRooms.map((data) {
+                      children: filteredRooms.map((data) {
                         final user = data['user'];
-                        final time =
-                            (data['lastTimestamp'] as Timestamp?)?.toDate();
-                        final formattedTime = time != null
-                            ? DateFormat('HH:mm').format(time)
+                        final messages = data['messages'] as List;
+
+                        // Ambil timestamp dari pesan terakhir
+                        final lastTimestamp =
+                            data['lastTimestamp'] as Timestamp?;
+                        final formattedTime = lastTimestamp != null
+                            ? DateFormat('HH:mm').format(lastTimestamp.toDate())
                             : '';
 
+                        // Ambil pesan terakhir atau pesan pertama untuk ditampilkan
+                        final lastMessage = _handleMessage(messages.isNotEmpty
+                            ? messages.last['isiPesan']
+                            : '');
+
                         return bubblePesan(
-                            '${user['sapaan']} ${user['name']}',
-                            data['lastMessage'] ?? '',
-                            formattedTime,
-                            () => _navigateToRoomChat(
-                                  isAnounce: false,
-                                  penerima: user,
-                                ),
-                            user['fotoPath'] ?? 'assets/images/Bu_rani.png',
-                            context, onLongPress: () {
-                          showDeleteChatDialog(
-                              context, widget.kelasId, data['roomId']);
-                        });
+                          '${user['sapaan']} ${user['name']}',
+                          lastMessage,
+                          formattedTime, // Tampilkan waktu yang sudah diformat
+                          () => _navigateToRoomChat(
+                            isAnounce: false,
+                            penerima: user,
+                          ),
+                          user['fotoPath'] ?? 'assets/images/Bu_rani.png',
+                          context,
+                        );
                       }).toList(),
                     );
                   },
                 );
               },
-            ),
+            )
+
           ],
         ),
       ),

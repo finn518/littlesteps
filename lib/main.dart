@@ -1,5 +1,6 @@
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-// import 'package:intl/date_symbol_data_file.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:littlesteps/pages/splash_screen.dart';
@@ -7,10 +8,10 @@ import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   await Supabase.initialize(
-    url: 'https://rsftbavuwvfqmdedqsdb.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzZnRiYXZ1d3ZmcW1kZWRxc2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxMzQyMDIsImV4cCI6MjA2MDcxMDIwMn0.YSmRF4VmQ_b4k8gBBL7CCOWKFZNPyGfGIVgom0ReZ28',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,8 +20,19 @@ Future<void> main() async {
   );
 
   await initializeDateFormatting('id_ID', null);
+  // await FirebaseMessaging.instance.requestPermission();
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //   if (message.notification != null) {
+  //     // Tampilkan notifikasi lokal
+  //     // Atau pakai plugin seperti flutter_local_notifications
+  //     print('Notif masuk: ${message.notification!.title}');
+  //   }
+  // });
+
   runApp(MyApp());
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
