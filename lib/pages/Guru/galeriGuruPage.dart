@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:littlesteps/pages/Guru/uploadGaleri.dart';
@@ -16,6 +17,7 @@ class GaleriGuruPage extends StatefulWidget {
 
 class _GaleriGuruPageState extends State<GaleriGuruPage> {
   String? _selectedMonth;
+  final uid = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
@@ -189,13 +191,14 @@ class _GaleriGuruPageState extends State<GaleriGuruPage> {
                       final data = doc.data() as Map<String, dynamic>;
                       data['id'] = doc.id;
                       return PostCard(
+                        kelasId: widget.kelasId,
+                        userId: uid!,
                         userPhoto: data['userPhoto'] ?? '',
                         postId: data['id'],
                         userName: data['userName'] ?? 'Anonim',
                         dateUpload: data['dateUpload'] ?? '',
                         caption: data['caption'] ?? '',
                         filePath: data['filePath'] ?? '',
-                        likes: data['likes'] ?? 0,
                         isGuru: true,
                         onDelete: () => _deletePostingan(
                           data['id'],

@@ -1,17 +1,20 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
 // import 'package:video_player/video_player.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final String postId;
   final String? userPhoto;
   final String userName;
   final String dateUpload;
   final String caption;
   final String filePath;
-  final int likes;
   final bool isGuru;
+  final String kelasId;
+  final String userId;
+
   final VoidCallback? onDelete;
 
   const PostCard({
@@ -21,11 +24,76 @@ class PostCard extends StatelessWidget {
     required this.dateUpload,
     required this.caption,
     required this.filePath,
-    required this.likes,
     required this.isGuru,
+    required this.kelasId,
+    required this.userId,
     this.userPhoto,
     this.onDelete,
   });
+
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  bool isLiked = false;
+  int likeCount = 0;
+  bool isLiking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLikeStatus();
+  }
+
+  Future<void> fetchLikeStatus() async {
+    final likesRef = FirebaseFirestore.instance
+        .collection('kelas')
+        .doc(widget.kelasId)
+        .collection('postingan')
+        .doc(widget.postId)
+        .collection('likes');
+
+    final snapshot = await likesRef.get();
+    final likedByUser = await likesRef.doc(widget.userId).get();
+
+    setState(() {
+      likeCount = snapshot.size; // jumlah dokumen = jumlah like
+      isLiked = likedByUser.exists;
+    });
+  }
+
+  void toggleLike() async {
+    if (isLiking) return; // kalau masih proses, jangan lanjut
+    setState(() => isLiking = true);
+
+    final likesCollection = FirebaseFirestore.instance
+        .collection('kelas')
+        .doc(widget.kelasId)
+        .collection('postingan')
+        .doc(widget.postId)
+        .collection('likes');
+
+    final userLikeDoc = likesCollection.doc(widget.userId);
+    final docSnapshot = await userLikeDoc.get();
+
+    if (docSnapshot.exists) {
+      await userLikeDoc.delete();
+      setState(() {
+        isLiked = false;
+        likeCount = likeCount - 1;
+      });
+    } else {
+      await userLikeDoc.set({'likedAt': FieldValue.serverTimestamp()});
+      setState(() {
+        isLiked = true;
+        likeCount = likeCount + 1;
+      });
+    }
+
+    setState(() => isLiking = false); // proses selesai
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +102,7 @@ class PostCard extends StatelessWidget {
 
     return GestureDetector(
       onLongPress: () {
-        if (isGuru) {
+        if (widget.isGuru) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -78,7 +146,7 @@ class PostCard extends StatelessWidget {
                           ),
                           onPressed: () {
                             Navigator.pop(context);
-                            if (onDelete != null) onDelete!();
+                            if (widget.onDelete != null) widget.onDelete!();
                           },
                           child: const Text(
                             "Ya",
@@ -155,9 +223,9 @@ class PostCard extends StatelessWidget {
               const SizedBox(height: 20),
               _uploader(),
               const SizedBox(height: 20),
-              _mediaWidget(filePath),
+              _mediaWidget(widget.filePath),
               const SizedBox(height: 15),
-              _postAction(likes),
+              _postAction(),
             ],
           ),
         ),
@@ -169,8 +237,9 @@ class PostCard extends StatelessWidget {
     return Row(
       children: [
         CircleAvatar(
-          backgroundImage: (userPhoto != null && userPhoto!.isNotEmpty)
-              ? NetworkImage(userPhoto!)
+          backgroundImage: (widget.userPhoto != null &&
+                  widget.userPhoto!.isNotEmpty)
+              ? NetworkImage(widget.userPhoto!)
               : const AssetImage('assets/images/Bu_cindy.png') as ImageProvider,
           radius: 20,
         ),
@@ -179,13 +248,13 @@ class PostCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              userName,
+              widget.userName,
               style: const TextStyle(
                 fontVariations: [FontVariation('wght', 800)],
               ),
             ),
             Text(
-              dateUpload,
+              widget.dateUpload,
               style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 12,
@@ -196,7 +265,6 @@ class PostCard extends StatelessWidget {
       ],
     );
   }
-
 
   Widget _mediaWidget(String path) {
     bool isVideo = path.toLowerCase().endsWith('.mp4');
@@ -225,7 +293,7 @@ class PostCard extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Text(
-          caption,
+          widget.caption,
           style: const TextStyle(
             fontFamily: "Poppins",
             fontSize: 14,
@@ -236,50 +304,20 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  // Widget _mediaWidget(String path) {
-  //   bool isVideo = path.toLowerCase().endsWith('.mp4');
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       AspectRatio(
-  //         aspectRatio: 1,
-  //         child: ClipRRect(
-  //           borderRadius: BorderRadius.circular(8),
-  //           child: isVideo
-  //               ? _VideoPlayerWidget(videoUrl: path)
-  //               : Image.network(
-  //                   path,
-  //                   fit: BoxFit.cover,
-  //                   errorBuilder: (_, __, ___) =>
-  //                       const Icon(Icons.broken_image),
-  //                 ),
-  //         ),
-  //       ),
-  //       const SizedBox(height: 20),
-  //       Text(
-  //         caption,
-  //         style: const TextStyle(
-  //           fontFamily: "Poppins",
-  //           fontSize: 14,
-  //           fontWeight: FontWeight.w500,
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }
-
-  Widget _postAction(int totalLike) {
+  Widget _postAction() {
     return Row(
       children: [
         GestureDetector(
-          onTap: () {
-            // Aksi tombol like
-          },
-          child: const Icon(Icons.favorite_border_outlined, size: 32),
+          onTap: toggleLike,
+          child: Icon(
+            isLiked ? Icons.favorite : Icons.favorite_border,
+            color: isLiked ? Colors.red : Colors.black,
+            size: 32,
+          ),
         ),
         const SizedBox(width: 10),
         Text(
-          totalLike > 0 ? "$totalLike Suka" : "Suka",
+          likeCount > 0 ? "$likeCount Suka" : "Suka",
           style: const TextStyle(
             fontSize: 16,
             fontFamily: 'Poppins',
@@ -290,84 +328,3 @@ class PostCard extends StatelessWidget {
     );
   }
 }
-
-// class _VideoPlayerWidget extends StatefulWidget {
-//   final String videoUrl;
-//   const _VideoPlayerWidget({Key? key, required this.videoUrl})
-//       : super(key: key);
-
-//   @override
-//   State<_VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
-// }
-
-// class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
-//   late VideoPlayerController _controller;
-//   bool _initialized = false;
-//   bool _showControls = true;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
-//       ..initialize().then((_) {
-//         setState(() {
-//           _initialized = true;
-//         });
-//         _controller.setLooping(true);
-//         _controller.play();
-//       });
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   void _togglePlayPause() {
-//     setState(() {
-//       if (_controller.value.isPlaying) {
-//         _controller.pause();
-//       } else {
-//         _controller.play();
-//       }
-//       _showControls = true;
-//       Future.delayed(const Duration(seconds: 2), () {
-//         if (mounted) {
-//           setState(() {
-//             _showControls = false;
-//           });
-//         }
-//       });
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return _initialized
-//         ? GestureDetector(
-//             onTap: _togglePlayPause,
-//             child: Stack(
-//               alignment: Alignment.center,
-//               children: [
-//                 VideoPlayer(_controller),
-//                 AnimatedOpacity(
-//                   opacity: _showControls ? 1.0 : 0.0,
-//                   duration: const Duration(milliseconds: 300),
-//                   child: Container(
-//                     color: Colors.black45,
-//                     child: Icon(
-//                       _controller.value.isPlaying
-//                           ? Icons.pause_circle
-//                           : Icons.play_circle,
-//                       color: Colors.white,
-//                       size: 64,
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           )
-//         : const Center(child: CircularProgressIndicator());
-//   }
-// }
