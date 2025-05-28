@@ -16,17 +16,18 @@ class _BerandaState extends State<Beranda> {
   String? kelasId;
   List<DocumentSnapshot> postingan = [];
   bool isLoading = true;
+  final uid = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    
   }
 
   Future<void> fetchData() async {
     try {
       // Ambil data user login
-      final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
 
       final userSnapshot =
@@ -108,13 +109,14 @@ class _BerandaState extends State<Beranda> {
               children: postingan.map((doc) {
                 final data = doc.data()! as Map<String, dynamic>;
                 return PostCard(
+                  userId: uid!,
+                  kelasId: kelasId!,
                   postId: doc.id,
                   userPhoto: data['userPhoto'] ?? '',
                   userName: data['userName'] ?? 'Anonim',
                   dateUpload: data['dateUpload'],
                   caption: data['caption'] ?? '',
                   filePath: data['filePath'] ?? '',
-                  likes: data['likes'] ?? 0,
                   isGuru: false,
                   onDelete: () {},
                 );
