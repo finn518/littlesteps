@@ -105,6 +105,34 @@ class _KeyAnakPageState extends State<KeyAnakPage> {
           });
 
           await batch.commit();
+          // Ambil data anak lagi (bisa disimpan sebelumnya juga)
+          final namaAnak = anakData['nama'] ?? 'Anak';
+
+// Ambil data kelas
+          final kelasDocData = kelasDoc.data();
+          final namaKelas = kelasDocData['nama'] ?? 'kelas';
+
+// Ambil foto user
+          final fotoUser = userData['fotoPath'] ?? '';
+
+// Ambil semua user dengan role Guru dan kelasId sesuai
+          final guruQuery = await firestore
+              .collection('users')
+              .where('role', isEqualTo: 'Guru')
+              .get();
+
+          for (final guruDoc in guruQuery.docs) {
+            await firestore
+                .collection('users')
+                .doc(guruDoc.id)
+                .collection('notifikasi')
+                .add({
+              'waktu': FieldValue.serverTimestamp(),
+              'fotoUser': fotoUser,
+              'pesan':
+                  'Orang tua $namaAnak ($parentName) telah bergabung di kelas $namaKelas',
+            });
+          }
 
           final anak = Anak.fromMap(anakData);
 

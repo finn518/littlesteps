@@ -287,6 +287,26 @@ class _UploadGaleriState extends State<UploadGaleri> {
                       // 🔥 Simpan ke Firestore
                       await postinganRef.set(postData);
 
+                      // 🔔 Tambahkan notifikasi ke semua user Orang Tua di kelas ini
+                      final orangTuaSnapshot = await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('role', isEqualTo: 'Orang Tua')
+                          .where('kelasId', isEqualTo: widget.kelasId)
+                          .get();
+
+                      for (final doc in orangTuaSnapshot.docs) {
+                        final orangTuaId = doc.id;
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(orangTuaId)
+                            .collection('notifikasi')
+                            .add({
+                          'fotoUser': userPhoto,
+                          'pesan': '$userName telah menambahkan postingan baru',
+                          'waktu': FieldValue.serverTimestamp(),
+                        });
+                      }
+
                       // 🔄 Reset form
                       setState(() {
                         _selectedFile = null;

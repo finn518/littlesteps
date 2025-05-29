@@ -98,6 +98,36 @@ class _RoomChatPageState extends State<RoomChatPage> {
       'timestamp': FieldValue.serverTimestamp(),
     });
 
+    // Ambil data user pengirim (nama + foto)
+    final pengirimSnapshot =
+        await firestore.collection('users').doc(userId).get();
+    final pengirimData = pengirimSnapshot.data();
+
+    final sapaan = pengirimData?['sapaan'];
+    final namaLengkap = pengirimData?['name'] ?? 'Pengirim';
+    final namaUser = sapaan != null ? "$sapaan $namaLengkap" : namaLengkap;
+    final fotoUser = pengirimData?['fotoPath'] ?? '';
+
+    // Ambil semua user dengan role 'Orang Tua' yang ada di kelas ini
+    final orangTuaSnapshot = await firestore
+        .collection('users')
+        .where('role', isEqualTo: 'Orang Tua')
+        .where('kelasId', isEqualTo: widget.kelasId)
+        .get();
+
+    for (final doc in orangTuaSnapshot.docs) {
+      final orangTuaId = doc.id;
+      await firestore
+          .collection('users')
+          .doc(orangTuaId)
+          .collection('notifikasi')
+          .add({
+        'fotoUser': fotoUser,
+        'pesan': '$namaUser telah membuat pengumuman baru',
+        'waktu': FieldValue.serverTimestamp(),
+      });
+    }
+
     pesan.clear();
     setState(() {
       selectedImage = null;
@@ -146,6 +176,27 @@ class _RoomChatPageState extends State<RoomChatPage> {
         .set({
       'lastUpdate': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+
+    // 🔍 Ambil data pengirim
+    final pengirimSnapshot =
+        await firestore.collection('users').doc(senderId).get();
+    final pengirimData = pengirimSnapshot.data();
+
+    final namaPengirim =
+        "${pengirimData?['sapaan']} ${pengirimData?['name']}" ??
+            pengirimData?['name'];
+    final fotoPengirim = pengirimData?['fotoPath'] ?? '';
+
+    // 🔔 Tambahkan notifikasi ke penerima
+    await firestore
+        .collection('users')
+        .doc(penerimaId)
+        .collection('notifikasi')
+        .add({
+      'fotoUser': fotoPengirim,
+      'pesan': 'Ada chat baru dari $namaPengirim',
+      'waktu': FieldValue.serverTimestamp(),
+    });
 
     pesan.clear();
     setState(() {
