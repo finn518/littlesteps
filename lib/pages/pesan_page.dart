@@ -20,7 +20,7 @@ class _PesanPageState extends State<PesanPage> {
   final firestore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   late String currentUserId;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String searchText = '';
   Timer? _searchDebounce;
 

@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:littlesteps/model/Jadwal.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:littlesteps/model/Jadwal.dart';
 import 'package:littlesteps/widgets/appBackground.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class JadwalHarianPage extends StatefulWidget {
   const JadwalHarianPage({super.key});
@@ -60,8 +60,6 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
           .toList();
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +217,6 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
                             color: Color(0xffC0C0C0),
                           ),
                         ),
-
                         border: OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Color(0xffC0C0C0), width: 0.5),
@@ -516,6 +513,7 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
       },
     );
   }
+
   Future<void> _deleteJadwal(String jadwalId) async {
     try {
       await firestore
@@ -539,7 +537,7 @@ class _JadwalHarianPageState extends State<JadwalHarianPage> {
     }
   }
 
-Widget agenda(Jadwal jadwal) {
+  Widget agenda(Jadwal jadwal) {
     return GestureDetector(
       onTap: () => openBottomDrawer(context, existingData: {
         'id': jadwal.id,
@@ -605,7 +603,6 @@ Widget agenda(Jadwal jadwal) {
       ),
     );
   }
-
 
   Widget CustomCalendar() {
     return Card(
