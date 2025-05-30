@@ -123,7 +123,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     Center(
                         child: CustomTextField(
-                            label: "Surel", controller: emailController)),
+                            label: "Email", controller: emailController)),
                     SizedBox(
                       height: 15,
                     ),

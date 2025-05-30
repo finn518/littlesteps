@@ -92,7 +92,12 @@ class AuthService {
     try {
       if (selectedRole.isEmpty) return 'Role tidak boleh kosong';
 
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+
+      await googleSignIn
+          .signOut(); // Tambahkan ini agar user selalu diminta pilih akun
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return 'Login dengan Google dibatalkan';
 
       final googleAuth = await googleUser.authentication;
@@ -111,7 +116,6 @@ class AuthService {
         final doc = await docRef.get();
 
         if (!doc.exists) {
-          // Jika pengguna baru, daftarkan dengan role yang dipilih
           await docRef.set({
             'email': user.email ?? '',
             'name': user.displayName ?? '',
@@ -121,26 +125,22 @@ class AuthService {
           });
           debugPrint('Data pengguna baru berhasil disimpan di Firestore');
         } else {
-          // Jika pengguna sudah ada, periksa role-nya
           String storedRole = doc.get('role') ?? '';
-          print(storedRole);
-          print(selectedRole);
-
           if (storedRole != selectedRole) {
             await firebaseAuth.signOut();
             return 'Akun Tidak terdaftar';
           }
-
           debugPrint('Pengguna sudah ada di Firestore');
         }
       }
 
-      return null; // Return null jika berhasil
+      return null;
     } catch (e) {
       debugPrint('Error selama signInWithGoogle: $e');
       return 'Terjadi kesalahan saat login dengan Google';
     }
   }
+
 
   // Log out
   Future<void> signOut() async {

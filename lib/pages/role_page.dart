@@ -43,14 +43,15 @@ class _RolePageState extends State<RolePage> {
                 children: [
                   Image.asset(
                     "assets/images/LOGO_FINAL.png",
-                    width: 300,
+                    width: 350,
                     height: 200,
                   ),
                   Padding(
                     padding: EdgeInsets.only(
                       bottom: _deviceHeight * 0.012,
-                      left: _deviceWidth * 0.1,
-                      top: _deviceHeight * 0.18,
+                      left: _deviceWidth * 0.15,
+                      right: _deviceWidth * 0.15,
+                      top: _deviceHeight * 0.2,
                     ),
                     child: const Text(
                       "Siapakah Anda ?",
@@ -62,6 +63,9 @@ class _RolePageState extends State<RolePage> {
                     ),
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 20,
               ),
               roleBtn("Guru"),
               roleBtn("Orang Tua"),
@@ -107,3 +111,4 @@ class _RolePageState extends State<RolePage> {
     );
   }
 }
+
