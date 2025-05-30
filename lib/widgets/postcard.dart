@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:littlesteps/utils/device_dimension.dart';
@@ -57,6 +56,8 @@ class _PostCardState extends State<PostCard> {
     final snapshot = await likesRef.get();
     final likedByUser = await likesRef.doc(widget.userId).get();
 
+    if (!mounted) return;
+
     setState(() {
       likeCount = snapshot.size; // jumlah dokumen = jumlah like
       isLiked = likedByUser.exists;
@@ -93,7 +94,6 @@ class _PostCardState extends State<PostCard> {
 
     setState(() => isLiking = false); // proses selesai
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -239,73 +239,63 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget editprofil(double width) {
     return Column(
       children: [
-        SizedBox(
+        Container(
           height: 200,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                top: -20,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/bgprofil.png"),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/bgprofil.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 0),
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Color(0xff0066FF),
+                    child: CircleAvatar(
+                      radius: 65,
+                      backgroundImage: selectedImage != null
+                          ? FileImage(selectedImage!)
+                          : (fotoPath != null
+                              ? (fotoPath!.startsWith('http')
+                                  ? NetworkImage(fotoPath!)
+                                  : FileImage(File(fotoPath!)) as ImageProvider)
+                              : AssetImage('assets/images/Bu_mira.png')
+                                  as ImageProvider),
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                left: width * 0.32,
-                bottom: -40,
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 70,
-                      backgroundColor: Color(0xff0066FF),
+                  Positioned(
+                    bottom: 4,
+                    right: 4,
+                    child: GestureDetector(
+                      onTap: () async {
+                        debugPrint("IconButton Detected!");
+                        await pickImage();
+                      },
                       child: CircleAvatar(
-                        radius: 65,
-                        backgroundImage: selectedImage != null
-                            ? FileImage(selectedImage!)
-                            : (fotoPath != null
-                                ? (fotoPath!.startsWith('http')
-                                    ? NetworkImage(fotoPath!)
-                                    : FileImage(File(fotoPath!))
-                                        as ImageProvider)
-                                : AssetImage('assets/images/Bu_mira.png')
-                                    as ImageProvider),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () async {
-                          debugPrint("IconButton Detected!");
-                          await pickImage();
-                        },
+                        radius: 22, // Outer white circle
+                        backgroundColor: Colors.white,
                         child: CircleAvatar(
-                          radius: 22, // Lingkaran luar putih
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: 16, // Lingkaran biru muda
-                            backgroundColor: Colors.blue[100],
-                            child: ImageIcon(
-                              AssetImage('assets/icons/edit.png'),
-                              color: Colors.black,
-                              size: 18,
-                            ),
+                          radius: 16, // Inner light blue
+                          backgroundColor: Colors.blue[100],
+                          child: ImageIcon(
+                            AssetImage('assets/icons/edit.png'),
+                            color: Colors.black,
+                            size: 18,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         SizedBox(height: 80),
